@@ -19,7 +19,8 @@ srai - shift right aritm imm    - 31 - 49
 j - jump                        - 40 - 64
 call                            - 41 - 65
 ret                             - 42 - 66
-urm_eticheta                    - 43 - 67
+
+urm_eticheta                    - 45 - 69
 
 beqz - branch if = 0            - 50 - 80
 bnez - brach if != 0            - 51 - 81
