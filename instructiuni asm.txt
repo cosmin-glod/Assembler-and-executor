@@ -1,0 +1,61 @@
+                                 HEX  DEC
+la - load immediate             - 00 - 0
+lb - load byte                  - 01 - 1
+lw - load word (4 bytes)        - 02 - 2
+ld - load double word (8 bytes) - 03 - 3
+li - load address               - 04 - 4
+
+add  -  reg reg                 - 10 - 16
+addi -  reg const               - 11 - 17
+sub - 
+
+sb - save byte(reg to mem)      - 20 - 32
+sd - save double(reg to mem)    - 21 - 33
+mv - move                       - 22 - 34
+
+slli - shift left logical imm   - 30 - 48
+srai - shift right aritm imm    - 31 - 49
+
+j - jump                        - 40 - 64
+call                            - 41 - 65
+ret                             - 42 - 66
+urm_eticheta                    - 43 - 67
+
+beqz - branch if = 0            - 50 - 80
+bnez - brach if != 0            - 51 - 81
+bge - branch if o1 >= o2        - 52 - 82
+bgt - branch if o1 > o2         - 53 - 83
+ble - branch if o1 <= o2        - 54 - 84
+
+fld                             - 60 - 96
+fsw                             - 61 - 97
+flw                             - 62 - 98
+
+----------REGISTRI------------
+
+      HEX  DEC
+zero - 00 - 0
+ra - 01   - 1
+sp - 02   - 2
+gp - 03   - 3
+tp - 04   - 4
+
+t0 - 10   - 16
+t1 - 11   - 17
+t2 - 12   - 18
+..
+t6 - 16   - 22
+
+s0 - 20   - 32
+s1 - 21   - 33
+...
+s11 -2B   - 40
+
+a0 - 30   - 48
+a1 - 31   - 49
+a2 - 32   - 50
+a3
+a4
+a5
+a6
+a7 - 37   - 55
