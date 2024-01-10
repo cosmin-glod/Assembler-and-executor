@@ -1,3 +1,4 @@
+---------INSTRUCTIUNI---------
                                  HEX  DEC
 la - load immediate             - 00 - 0
 lb - load byte                  - 01 - 1
@@ -7,7 +8,7 @@ li - load address               - 04 - 4
 
 add  -  reg reg                 - 10 - 16
 addi -  reg const               - 11 - 17
-sub - 
+sub -                           - 12 - 18 
 
 sb - save byte(reg to mem)      - 20 - 32
 sd - save double(reg to mem)    - 21 - 33
@@ -20,17 +21,26 @@ j - jump                        - 40 - 64
 call                            - 41 - 65
 ret                             - 42 - 66
 
-urm_eticheta                    - 45 - 69
-
 beqz - branch if = 0            - 50 - 80
 bnez - brach if != 0            - 51 - 81
 bge - branch if o1 >= o2        - 52 - 82
 bgt - branch if o1 > o2         - 53 - 83
 ble - branch if o1 <= o2        - 54 - 84
 
-fld                             - 60 - 96
-fsw                             - 61 - 97
-flw                             - 62 - 98
+flw                             - 60 - 96
+fld                             - 61 - 97
+fsw                             - 62 - 98
+
+fadd.d                          - 70 - 112
+fsub.d                          - 71 - 113
+fmul.d                          - 72 - 114
+fsqrt.d                         - 73 - 115
+ 
+fmv.s                           - 80 - -128
+fmv.s.x                         - 81 - -127
+fgt.s                           - 82 - -126
+flt.s                           - 83 - -125
+
 
 ----------REGISTRI------------
 
@@ -55,8 +65,27 @@ s11 -2B   - 40
 a0 - 30   - 48
 a1 - 31   - 49
 a2 - 32   - 50
-a3
+a3 - 33   - 51
 a4
 a5
 a6
 a7 - 37   - 55
+
+---------FUNCTII DIN C----------
+
+         HEX DEC
+printf - 60 - 96
+scanf  - 61 - 97
+strlen - 70 - 112
+cfunc  - 71 - 113
+
+
+---------REGISTRII FOLOSITI-------
+
+speciali: sp ra
+
+t: 0 1 2 3 4 5
+s: 1
+a: 0 1 2 3
+
+
