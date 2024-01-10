@@ -63,8 +63,13 @@ int main () {
     CFunctions["scanf"] = 97;
     CFunctions["cfunc"] = 113;
 
+    std::string line;
+
+    std:getline (in, line);
+    std::getline (in, line);
+    std::getline (in, line);
+
     while (!in.eof ()) {
-        std::string line;
         std::getline (in, line);
 
         int i  = 0;
@@ -81,8 +86,13 @@ int main () {
         if (currentInstruction[currentInstruction.size () - 1] == ':') {
 
             int currentSize = executabil.tellg ();
+
+            //std::cout << currentSize << '\n';
+
             currentInstruction.pop_back ();
             posEtichete[currentInstruction] = currentSize;
+
+            //std::cout << posEtichete["1"] << '\n';
 
             std::list<std::pair<std::string, int>>::iterator it = waitingLabels.begin ();
 
@@ -299,10 +309,9 @@ int main () {
                 int zero = 0;
                 executabil.write (reinterpret_cast<const char *> (&zero), 2);
 
-            } else if (line[i] == 'b') {
-                label.pop_back ();
+            } else if (line[i] == 'b')
                 executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
-            }
+
         } else if (currentInstruction == "bge" || currentInstruction == "bgt" || currentInstruction == "ble") {
             while (line[i] == ' ') i += 1;
 
@@ -337,7 +346,6 @@ int main () {
 
             if (line[i] == 'f') {
                 int currentSize = executabil.tellg ();
-                label.pop_back ();
 
                 //std::cout << label.siz << '\n';
 
@@ -346,7 +354,6 @@ int main () {
                 int zero = 0;
                 executabil.write (reinterpret_cast<const char *> (&zero), 2);
             } else if (line[i] == 'b') {
-                label.pop_back ();
                 executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
             }
         } else if (currentInstruction == "call") {
