@@ -46,19 +46,14 @@ int main () {
     instructions["sub"] = 18;
     instructions["bgt"] = 83;
     instructions["ble"] = 84;
-    instructions["sd"] = 21;
 
 
     Registers["zero"] = 0;
     Registers["ra"] = 1;
     Registers["sp"] = 2;
-    Registers["s1"] = 33;
     Registers["t0"] = 16;
     Registers["t1"] = 17;
     Registers["t2"] = 18;
-    Registers["t3"] = 19;
-    Registers["t4"] = 20;
-    Registers["t5"] = 21;
     Registers["a0"] = 48;
     Registers["a1"] = 49;
     Registers["a2"] = 50;
@@ -268,23 +263,21 @@ int main () {
 
             std::string label = "";
 
-            while (line[i] != ' ')
+            while (line[i] != 'b' && line[i] != 'f')
                 label += line[i], i += 1;
 
             executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister]), 1);
 
-            if (label[label.size () - 1] == 'f') {
+            if (line[i] == 'f') {
                 int currentSize = executabil.tellg ();
-                label.pop_back ();
 
                 waitingLabels.push_back (std::make_pair (label, currentSize));
 
                 int zero = 0;
                 executabil.write (reinterpret_cast<const char *> (&zero), 2);
 
-            } else if (label[label.size () - 1] == 'b') {
-                label.pop_back ();
+            } else if (line[i] == 'b') {
                 executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
             }
         } else if (currentInstruction == "j") {
@@ -293,21 +286,20 @@ int main () {
 
             while (line[i] == ' ') i += 1;
 
-            while (line[i] != ' ')
+            while (line[i] != 'b' && line[i] != 'f')
                 label += line[i], i += 1;
 
             executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
 
-            if (label[label.size () - 1] == 'f') {
+            if (line[i] == 'f') {
                 int currentSize = executabil.tellg ();
-                label.pop_back ();
 
                 waitingLabels.push_back (std::make_pair (label, currentSize));
 
                 int zero = 0;
                 executabil.write (reinterpret_cast<const char *> (&zero), 2);
 
-            } else if (label[label.size () - 1] == 'b') {
+            } else if (line[i] == 'b') {
                 label.pop_back ();
                 executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
             }
@@ -330,22 +322,30 @@ int main () {
 
             std::string label = "";
 
-            while (line[i] != ' ')
+            while (line[i] != 'b' && line[i] != 'f')
                 label += line[i], i += 1;
+
+            //while (line[i] != ' ' || line[i] != '\n')
+                //std::cout << line[i], i += 1;
+                //label += line[i], i += 1;
 
             executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
 
-            if (label[label.size () - 1] == 'f') {
+            //std::cout << label.size () << '\n';
+
+            if (line[i] == 'f') {
                 int currentSize = executabil.tellg ();
                 label.pop_back ();
+
+                //std::cout << label.siz << '\n';
 
                 waitingLabels.push_back (std::make_pair (label, currentSize));
 
                 int zero = 0;
                 executabil.write (reinterpret_cast<const char *> (&zero), 2);
-            } else if (label[label.size () - 1] == 'b') {
+            } else if (line[i] == 'b') {
                 label.pop_back ();
                 executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
             }
