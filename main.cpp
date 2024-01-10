@@ -46,14 +46,19 @@ int main () {
     instructions["sub"] = 18;
     instructions["bgt"] = 83;
     instructions["ble"] = 84;
+    instructions["sd"] = 21;
 
 
     Registers["zero"] = 0;
     Registers["ra"] = 1;
     Registers["sp"] = 2;
+    Registers["s1"] = 33;
     Registers["t0"] = 16;
     Registers["t1"] = 17;
     Registers["t2"] = 18;
+    Registers["t3"] = 19;
+    Registers["t4"] = 20;
+    Registers["t5"] = 21;
     Registers["a0"] = 48;
     Registers["a1"] = 49;
     Registers["a2"] = 50;
