@@ -27,7 +27,9 @@ bool isLetter (const char a) {
 }
 
 int main () {
+    instructions["la"] = 0;
     instructions["lb"] = 1;
+    instructions["lw"] = 2;
     instructions["ld"] = 3;
     instructions["li"] = 4;
     instructions["add"] = 16;
@@ -47,10 +49,24 @@ int main () {
     instructions["bgt"] = 83;
     instructions["ble"] = 84;
 
+    instructions["flw"] = 96;
+    instructions["fld"] = 97;
+    instructions["fsw"] = 98;
+
+    instructions["fadd.d"] = 112;
+    instructions["fsub.d"] = 113;
+    instructions["fmul.d"] = 114;
+    instructions["fsqrt.d"] = 115;
+
+    instructions["fmv.s"] = -128;
+    instructions["fmv.s.x"] = -127;
+    instructions["fgt.s"] = -126;
+    instructions["flt.s"] = -125;
 
     Registers["zero"] = 0;
     Registers["ra"] = 1;
     Registers["sp"] = 2;
+
 
     Registers["t0"] = 16;
     Registers["t1"] = 17;
@@ -59,10 +75,7 @@ int main () {
     Registers["t4"] = 20;
     Registers["t5"] = 21;
 
-    Registers["s0"] = 32;
     Registers["s1"] = 33;
-    Registers["s2"] = 34;
-    Registers["s3"] = 35;
 
     Registers["a0"] = 48;
     Registers["a1"] = 49;
@@ -268,7 +281,7 @@ int main () {
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
         } else if (currentInstruction == "ret") {
             executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
-        } else if (currentInstruction == "beqz" || currentInstruction == "bneqz") {
+        } else if (currentInstruction == "beqz" || currentInstruction == "bnez") {
             while (line[i] == ' ') i += 1;
 
             std::string currentRegister = "";
