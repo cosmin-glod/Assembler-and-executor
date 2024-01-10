@@ -58,15 +58,18 @@ int main () {
     instructions["fmul.d"] = 114;
     instructions["fsqrt.d"] = 115;
 
-    instructions["fmv.s"] = -128;
-    instructions["fmv.s.x"] = -127;
-    instructions["fgt.s"] = -126;
-    instructions["flt.s"] = -125;
+
+    instructions["fadd.s"] = -128;
+    instructions["fmul.s"] = -127;
+    instructions["fmv.s"] = -126;
+    instructions["fmv.s.x"] = -125;
+    instructions["fgt.s"] = -124;
+    instructions["flt.s"] = -123;
+
 
     Registers["zero"] = 0;
     Registers["ra"] = 1;
     Registers["sp"] = 2;
-
 
     Registers["t0"] = 16;
     Registers["t1"] = 17;
@@ -81,6 +84,15 @@ int main () {
     Registers["a1"] = 49;
     Registers["a2"] = 50;
     Registers["a3"] = 51;
+
+    Registers["ft0"] = 64;
+    Registers["ft1"] = 65;
+    Registers["ft2"] = 66;
+    Registers["ft3"] = 67;
+
+    Registers["fa0"] = 80;
+    Registers["fa1"] = 81;
+    Registers["fa2"] = 82;
 
     CFunctions["strlen"] = 112;
     CFunctions["printf"] = 96;
@@ -162,8 +174,8 @@ int main () {
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister]), 1);
             executabil.write (reinterpret_cast <const char *> (&nr), 4);
         } else if (currentInstruction == "add" || currentInstruction == "sub" || currentInstruction == "fsub.d"
-                   || currentInstruction == "fmul.d" || currentInstruction == "fadd.d"
-                   || currentInstruction == "fgt.s" || currentInstruction == "flt.s") {
+                   || currentInstruction == "fmul.d" || currentInstruction == "fadd.d" || currentInstruction == "fmul.s"
+                   || currentInstruction == "fgt.s" || currentInstruction == "flt.s" || currentInstruction == "fadd.s") {
             while (line[i] == ' ') i += 1;
 
             std::string currentRegister1 = "";
@@ -193,7 +205,7 @@ int main () {
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister3]), 1);
         } else if (currentInstruction == "sb" || currentInstruction == "sd" || currentInstruction == "lb"
                    || currentInstruction == "ld" || currentInstruction == "lw" || currentInstruction == "fld"
-                   || currentInstruction == "fsw") {
+                   || currentInstruction == "fsw" || currentInstruction == "flw") {
             while (line[i] == ' ') i += 1;
 
             std::string currentRegister1 = "";
@@ -261,7 +273,8 @@ int main () {
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
             executabil.write (reinterpret_cast<const char *> (&nr), 4);
-        } else if (currentInstruction == "mv" || currentInstruction == "fsqrt.d" || currentInstruction == "fmv.s") {
+        } else if (currentInstruction == "mv" || currentInstruction == "fsqrt.d" || currentInstruction == "fmv.s"
+                   || currentInstruction == "fmv.s.x") {
             while (line[i] == ' ') i += 1;
 
             std::string currentRegister1 = "";
@@ -415,8 +428,6 @@ int main () {
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
             executabil.write (reinterpret_cast<const char *> (&nr), 4);
-        } else if (currentInstruction == "fsub.d") {
-
         }
     }
     return 0;
