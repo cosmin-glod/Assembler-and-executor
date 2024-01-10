@@ -27,23 +27,23 @@ bool isLetter (const char a) {
 }
 
 int main () {
+    instructions["lb"] = 1;
+    instructions["ld"] = 3;
     instructions["li"] = 4;
     instructions["add"] = 16;
     instructions["addi"] = 17;
-    instructions["lb"] = 1;
-    instructions["mv"] = 34;
-    instructions["mv"] = 34;
-    instructions["ret"] = 66;
-    instructions["eticheta"] = 69;
-    instructions["beqz"] = 80;
-    instructions["bneqz"] = 81;
-    instructions["j"] = 64;
-    instructions["sb"] = 32;
-    instructions["bge"] = 82;
-    instructions["call"] = 65;
-    instructions["srai"] = 49;
-    instructions["slli"] = 48;
     instructions["sub"] = 18;
+    instructions["sb"] = 32;
+    instructions["sd"] = 33;
+    instructions["mv"] = 34;
+    instructions["slli"] = 48;
+    instructions["srai"] = 49;
+    instructions["j"] = 64;
+    instructions["call"] = 65;
+    instructions["ret"] = 66;
+    instructions["beqz"] = 80;
+    instructions["bnez"] = 81;
+    instructions["bge"] = 82;
     instructions["bgt"] = 83;
     instructions["ble"] = 84;
 
@@ -51,12 +51,23 @@ int main () {
     Registers["zero"] = 0;
     Registers["ra"] = 1;
     Registers["sp"] = 2;
+
     Registers["t0"] = 16;
     Registers["t1"] = 17;
     Registers["t2"] = 18;
+    Registers["t3"] = 19;
+    Registers["t4"] = 20;
+    Registers["t5"] = 21;
+
+    Registers["s0"] = 32;
+    Registers["s1"] = 33;
+    Registers["s2"] = 34;
+    Registers["s3"] = 35;
+
     Registers["a0"] = 48;
     Registers["a1"] = 49;
     Registers["a2"] = 50;
+    Registers["a3"] = 51;
 
     CFunctions["strlen"] = 112;
     CFunctions["printf"] = 96;
@@ -397,4 +408,3 @@ int main () {
     }
     return 0;
 }
-
