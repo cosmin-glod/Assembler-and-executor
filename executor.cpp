@@ -253,6 +253,15 @@ int main () {
         executabil.read (&code, 1);
     }
 
+    for (auto x : registers)
+    {
+        if (x.second.isInt)
+            fout << x.first << ' ' << x.second.val << '\n';
+        else if (x.second.isChar)
+            fout << x.first << ' ' << x.second.car << '\n';
+        else
+            fout << x.first << ' ' << x.second.String << '\n';
+
     std::cout << "Rezultat: " << registers["a0"].String;
     return 0;
 }
