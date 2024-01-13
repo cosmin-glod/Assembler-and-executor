@@ -25,16 +25,27 @@ int main () {
         std::getline (fin, line);
 
         int i = 0;
-        while (!isalpha (line[i]) && line[i] != NULL) i += 1;
-
         std::string currentRegister = "";
-        while (line[i] != NULL && line[i] != ' ')
+        while (line[i] != ' ')
             currentRegister += line[i], i += 1;
 
         i += 1;
 
+
+        std::string dataType = "";
+        while (line[i] != NULL && line[i] != ' ')
+            dataType += line[i], i += 1;
+
+        i += 1;
+
         line.erase (0, i);
-        registers[currentRegister].String = line;
+
+        if (dataType == "string") {
+            registers[currentRegister].String = line;
+            registers[currentRegister].isString = true;
+        }
+        //line.erase (0, i);
+        //registers[currentRegister].String = line;
     }
 
     codeRegisters[0] = "zero";
@@ -71,6 +82,7 @@ int main () {
     cod_functions[113] = "cfunc";
 */
 
+    //std::cout << std::hex;
 
     char code;
     executabil.read (&code, 1);
@@ -81,9 +93,6 @@ int main () {
 
             int constant;
             executabil.read (reinterpret_cast<char *> (&constant), 4);
-
-            registers[codeRegisters[(int) currentRegister]].val = constant;
-            registers[codeRegisters[(int) currentRegister]].isInt = true;
         } else if (code == 16) {
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
@@ -93,12 +102,41 @@ int main () {
 
             char currentRegister3;
             executabil.read (&currentRegister3, 1);
+        } else if (code == 1) {
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
 
+            int constant;
+            executabil.read (reinterpret_cast<char *> (&constant), 4);
 
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
+        } else if (code == 80) {
+            char currentRegister;
+            executabil.read (&currentRegister, 1);
+
+            int constant;
+            executabil.read (reinterpret_cast<char *> (&constant), 2);
+        } else if (code == 17) {
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
+
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
+
+            int constant;
+            executabil.read (reinterpret_cast<char *> (&constant), 4);
+        } else if (code == 64) {
+            int constant;
+            executabil.read (reinterpret_cast<char *> (&constant), 2);
+        } else if (code == 34) {
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
+
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
         }
         executabil.read (&code, 1);
     }
-
-    std::cout << registers["t0"].val;
     return 0;
 }
