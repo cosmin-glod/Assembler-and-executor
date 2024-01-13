@@ -1,6 +1,3 @@
-Assembler si executor
-
-Echipa formata din:
-  Cosmin-Stefan Glod -> Grupa 151
-  Alexandros Nita -> Grupa 151
-  Daniel Birsan -> Grupa 151
+<html>
+  <h1>Proiect ASC</h1>
+</html>
