@@ -1,32 +1,22 @@
-cod_registers[0] = "zero";
-    cod_registers[1] = "ra";
-    cod_registers[2] = "sp";
+code_registers[16] = "t0";
+code_registers[17] = "t1";
+code_registers[18] = "t2";
+code_registers[19] = "t3";
+code_registers[20] = "t4";
+code_registers[21] = "t5";
 
-    cod_registers[16] = "t0"
-    cod_registers[17] = "t1"
-    cod_registers[18] = "t2"
-    cod_registers[19] = "t3"
-    cod_registers[20] = "t4"
-    cod_registers[21] = "t5"
+code_registers[33] = "s1";
 
-    cod_registers[33] = "s1"
+code_registers[48] = "a0";
+code_registers[49] = "a1";
+code_registers[50] = "a2";
+code_registers[51] = "a3";
 
-    cod_registers[48] = "a0"
-    cod_registers[49] = "a1"
-    cod_registers[50] = "a2"
-    cod_registers[51] = "a3"
+code_registers[64] = "ft0";
+code_registers[65] = "ft1";
+code_registers[66] = "ft2";
+code_registers[67] = "ft3";
 
-    cod_registers[64] = "ft0"
-    cod_registers[65] = "ft1"
-    cod_registers[66] = "ft2"
-    cod_registers[67] = "ft3"
-
-    cod_registers[80] = "fa0"
-    cod_registers[81] = "fa1"
-    cod_registers[82] = "fa2"
-
-
-    cod_functions[112] = "strlen";
-    cod_functions[96] = "printf";
-    cod_functions[97] = "scanf";
-    cod_functions[113] = "cfunc";
+code_registers[80] = "fa0";
+code_registers[81] = "fa1";
+code_registers[82] = "fa2";
