@@ -1,92 +1,434 @@
 #include <ios>
+#include <istream>
+#include <utility>
 #include <iostream>
 #include <fstream>
-#include <bitset>
 #include <string>
+#include <list>
 #include <map>
 
-std::ifstream fin("nume_fisier.in");
-std::fstream executabil("executabil.bin", std::ios::in | std::ios::binary);
+std::ifstream in("input.in");
+std::fstream executabil("executabil.bin", std::ios::out | std::ios::binary | std::ios::trunc);
 
-struct componenetsRegisters {
-    int val;
-    bool isInt = false;
+std::list<std::pair<std::string, int>> waitingLabels;
 
-    std::string String;
-    bool isString = false;
-};
+std::map<std::string, int> posEtichete;
 
-std::map<int, std::string> codeRegisters;
-std::map<std::string, componenetsRegisters> registers;
+std::map<std::string, int> CFunctions;
+std::map<std::string, int> instructions;
+std::map<std::string, int> Registers;
+
+bool isNumeric (const char a) {
+    return (a >= '0' && a <= '9');
+}
+
+bool isLetter (const char a) {
+    return (a >= 'a' && a <= 'z') || (a >= 'A' && a <= 'Z');
+}
 
 int main () {
-    while (!fin.eof ()) {
-        std::string line;
-        std::getline (fin, line);
+    instructions["la"] = 0;
+    instructions["lb"] = 1;
+    instructions["lw"] = 2;
+    instructions["ld"] = 3;
+    instructions["li"] = 4;
+    instructions["add"] = 16;
+    instructions["addi"] = 17;
+    instructions["sub"] = 18;
+    instructions["sb"] = 32;
+    instructions["sd"] = 33;
+    instructions["mv"] = 34;
+    instructions["slli"] = 48;
+    instructions["srai"] = 49;
+    instructions["j"] = 64;
+    instructions["call"] = 65;
+    instructions["ret"] = 66;
+    instructions["beqz"] = 80;
+    instructions["bnez"] = 81;
+    instructions["bge"] = 82;
+    instructions["bgt"] = 83;
+    instructions["ble"] = 84;
 
-        int i = 0;
-        while (!isalpha (line[i]) && line[i] != NULL) i += 1;
+    instructions["flw"] = 96;
+    instructions["fld"] = 97;
+    instructions["fsw"] = 98;
 
-        std::string currentRegister = "";
+    instructions["fadd.d"] = 112;
+    instructions["fsub.d"] = 113;
+    instructions["fmul.d"] = 114;
+    instructions["fsqrt.d"] = 115;
+
+
+    instructions["fadd.s"] = -128;
+    instructions["fmul.s"] = -127;
+    instructions["fmv.s"] = -126;
+    instructions["fmv.s.x"] = -125;
+    instructions["fgt.s"] = -124;
+    instructions["flt.s"] = -123;
+
+
+    Registers["zero"] = 0;
+    Registers["ra"] = 1;
+    Registers["sp"] = 2;
+
+    Registers["t0"] = 16;
+    Registers["t1"] = 17;
+    Registers["t2"] = 18;
+    Registers["t3"] = 19;
+    Registers["t4"] = 20;
+    Registers["t5"] = 21;
+
+    Registers["s1"] = 33;
+
+    Registers["a0"] = 48;
+    Registers["a1"] = 49;
+    Registers["a2"] = 50;
+    Registers["a3"] = 51;
+
+    Registers["ft0"] = 64;
+    Registers["ft1"] = 65;
+    Registers["ft2"] = 66;
+    Registers["ft3"] = 67;
+
+    Registers["fa0"] = 80;
+    Registers["fa1"] = 81;
+    Registers["fa2"] = 82;
+
+    CFunctions["strlen"] = 112;
+    CFunctions["printf"] = 96;
+    CFunctions["scanf"] = 97;
+    CFunctions["cfunc"] = 113;
+
+    std::string line;
+
+    std:getline (in, line);
+    std::getline (in, line);
+    std::getline (in, line);
+
+    while (!in.eof ()) {
+        std::getline (in, line);
+
+        int i  = 0;
+        while (line[i] != NULL && line[i] == ' ') i += 1;
+
+        if (line[i] == '#')
+            continue;
+
+        std::string currentInstruction = "";
+
         while (line[i] != NULL && line[i] != ' ')
-            currentRegister += line[i], i += 1;
+            currentInstruction += line[i], i += 1;
 
-        i += 1;
+        if (currentInstruction[currentInstruction.size () - 1] == ':') {
 
-        line.erase (0, i);
-        registers[currentRegister].String = line;
-    }
+            int currentSize = executabil.tellg ();
 
-    codeRegisters[0] = "zero";
-    codeRegisters[1] = "ra";
-    codeRegisters[2] = "sp";
+            //std::cout << currentSize << '\n';
 
-    codeRegisters[16] = "t0";
-    codeRegisters[17] = "t1";
-    codeRegisters[18] = "t2";
-    codeRegisters[19] = "t3";
-    codeRegisters[20] = "t4";
-    codeRegisters[21] = "t5";
+            currentInstruction.pop_back ();
+            posEtichete[currentInstruction] = currentSize;
 
-    codeRegisters[33] = "s1";
+            //std::cout << posEtichete["1"] << '\n';
 
-    codeRegisters[48] = "a0";
-    codeRegisters[49] = "a1";
-    codeRegisters[50] = "a2";
-    codeRegisters[51] = "a3";
+            std::list<std::pair<std::string, int>>::iterator it = waitingLabels.begin ();
 
-    codeRegisters[64] = "ft0";
-    codeRegisters[65] = "ft1";
-    codeRegisters[66] = "ft2";
-    codeRegisters[67] = "ft3";
+            while (it != waitingLabels.end ()) {
+                if ((*it).first == currentInstruction) {
+                    executabil.seekg ((*it).second, std::ios_base::beg);
+                    executabil.write (reinterpret_cast<const char *> (&posEtichete[currentInstruction]), 2);
+                    executabil.seekg (0, std::ios_base::end);
 
-    codeRegisters[80] = "fa0";
-    codeRegisters[81] = "fa1";
-    codeRegisters[82] = "fa2";
+                    it = waitingLabels.erase (it);
+                }
 
-/*
-    cod_functions[112] = "strlen";
-    cod_functions[96] = "printf";
-    cod_functions[97] = "scanf";
-    cod_functions[113] = "cfunc";
-*/
-
-    char code;
-    executabil.read (&code, 1);
-    while (code != 66) {
-        if (code == 4) {
-            char currentRegister;
-            executabil.read (&currentRegister, 1);
-
-            int constant;
-            executabil.read (reinterpret_cast<char *> (&constant), 4);
-
-            registers[codeRegisters[(int) currentRegister]].val = constant;
-            registers[codeRegisters[(int) currentRegister]].isInt = true;
+                else
+                    ++it;
+            }
         }
-        executabil.read (&code, 1);
-    }
 
-    std::cout << registers["t0"].val;
+
+        if (currentInstruction == "li") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            i -= 1;
+
+            bool Minus = 0;
+            if (line[i] == '-') Minus = 1;
+
+            i += 1;
+
+            int nr = 0;
+            while (isNumeric (line[i]))
+                nr = nr * 10 + (int) (line[i] - '0'), i += 1;
+
+            if (Minus == 1) nr = -nr;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister]), 1);
+            executabil.write (reinterpret_cast <const char *> (&nr), 4);
+        } else if (currentInstruction == "add" || currentInstruction == "sub" || currentInstruction == "fsub.d"
+                   || currentInstruction == "fmul.d" || currentInstruction == "fadd.d" || currentInstruction == "fmul.s"
+                   || currentInstruction == "fgt.s" || currentInstruction == "flt.s" || currentInstruction == "fadd.s") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            std::string currentRegister3 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister3 += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister3]), 1);
+        } else if (currentInstruction == "sb" || currentInstruction == "sd" || currentInstruction == "lb"
+                   || currentInstruction == "ld" || currentInstruction == "lw" || currentInstruction == "fld"
+                   || currentInstruction == "fsw" || currentInstruction == "flw") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            i -= 1;
+            bool Minus = 0;
+            if (line[i] == '-') Minus = 1;
+
+            i += 1;
+
+            int nr = 0;
+            while (isNumeric (line[i]))
+                nr = nr * 10 + (int) (line[i] - '0'), i += 1;
+
+            if (Minus == 1) nr = -nr;
+
+            i += 1;
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&nr), 4);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+        } else if (currentInstruction == "addi") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            i -= 1;
+
+            bool Minus = 0;
+            if (line[i] == '-') Minus = 1;
+            i += 1;
+
+            int nr = 0;
+
+            while (isNumeric (line[i]))
+                nr = nr * 10 + (int) (line[i] - '0'), i += 1;
+
+            if (Minus == 1) nr = -nr;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+            executabil.write (reinterpret_cast<const char *> (&nr), 4);
+        } else if (currentInstruction == "mv" || currentInstruction == "fsqrt.d" || currentInstruction == "fmv.s"
+                   || currentInstruction == "fmv.s.x") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+        } else if (currentInstruction == "ret") {
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+        } else if (currentInstruction == "beqz" || currentInstruction == "bnez") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister += line[i], i += 1;
+
+            while (line[i] == ' ' ) i += 1;
+
+            i += 1;
+
+            while (line[i] == ' ') i += 1;
+
+            std::string label = "";
+
+            while (line[i] != 'b' && line[i] != 'f')
+                label += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister]), 1);
+
+            if (line[i] == 'f') {
+                int currentSize = executabil.tellg ();
+
+                waitingLabels.push_back (std::make_pair (label, currentSize));
+
+                int zero = 0;
+                executabil.write (reinterpret_cast<const char *> (&zero), 2);
+
+            } else if (line[i] == 'b') {
+                executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
+            }
+        } else if (currentInstruction == "j") {
+
+            std::string label = "";
+
+            while (line[i] == ' ') i += 1;
+
+            while (line[i] != 'b' && line[i] != 'f')
+                label += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+
+            if (line[i] == 'f') {
+                int currentSize = executabil.tellg ();
+
+                waitingLabels.push_back (std::make_pair (label, currentSize));
+
+                int zero = 0;
+                executabil.write (reinterpret_cast<const char *> (&zero), 2);
+
+            } else if (line[i] == 'b')
+                executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
+
+        } else if (currentInstruction == "bge" || currentInstruction == "bgt" || currentInstruction == "ble") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            std::string label = "";
+
+            while (line[i] != 'b' && line[i] != 'f')
+                label += line[i], i += 1;
+
+            //while (line[i] != ' ' || line[i] != '\n')
+                //std::cout << line[i], i += 1;
+                //label += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+
+            //std::cout << label.size () << '\n';
+
+            if (line[i] == 'f') {
+                int currentSize = executabil.tellg ();
+
+                //std::cout << label.siz << '\n';
+
+                waitingLabels.push_back (std::make_pair (label, currentSize));
+
+                int zero = 0;
+                executabil.write (reinterpret_cast<const char *> (&zero), 2);
+            } else if (line[i] == 'b') {
+                executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
+            }
+        } else if (currentInstruction == "call") {
+            while (line[i] == ' ') i += 1;
+
+            std::string funct = "";
+
+            while (isLetter (line[i]))
+                funct += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&CFunctions[funct]), 1);
+        } else if (currentInstruction == "srai" || currentInstruction == "slli") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            int nr = 0;
+            while (isNumeric (line[i]))
+                nr = nr * 10 + (int) (line[i] - '0'), i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+            executabil.write (reinterpret_cast<const char *> (&nr), 4);
+        }
+    }
     return 0;
 }
