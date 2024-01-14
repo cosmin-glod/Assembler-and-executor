@@ -1,6 +1,5 @@
 #include <ios>
 #include <iostream>
-#include <typeinfo>
 #include <fstream>
 #include <cstring>
 #include <vector>
@@ -22,6 +21,7 @@ struct componenetsRegisters {
     int index;
     int whichString;
     bool isPointer = false;
+    bool isNull = false;
 };
 
 std::map<int, std::string> codeRegisters;
@@ -41,10 +41,11 @@ int main () {
             content.erase (0, 1);
 
         if (dataType == "string") {
+            content.resize (1000);
             strings.emplace_back (content);
-                
+
             registers[currentRegister].index = 0;
-            registers[currentRegister].whichString = strings.size ();
+            registers[currentRegister].whichString = strings.size () - 1;
             registers[currentRegister].isPointer = true;
         } else if (dataType == "int") {
             registers[currentRegister].val = std::stoi (content);
@@ -81,16 +82,16 @@ int main () {
     codeRegisters[82] = "fa2";
 
 /*
-    cod_functions[112] = "strlen";
-    cod_functions[96] = "printf";
-    cod_functions[97] = "scanf";
-    cod_functions[113] = "cfunc";
+    codeFunctions[112] = "strlen";
+    codeFunctions[96] = "printf";
+    codeFunctions[97] = "scanf";
+    codeFunctions[113] = "cfunc";
 */
 
     char code;
-    int test = 0;
     executabil.read (&code, 1);
     while (code != 66) {
+        //std::cout << std::hex << (int) code << ' ';
         if (code == 4) { /// li
             char currentRegister;
             executabil.read (&currentRegister, 1);
@@ -120,13 +121,13 @@ int main () {
                 registers[codeRegisters[i]].isPointer = true;
                 registers[codeRegisters[i]].isChar = registers[codeRegisters[i]].isInt = false;
 
-                registers[codeRegisters[i]].index = constant;
+                registers[codeRegisters[i]].index = registers[codeRegisters[k]].val;
                 registers[codeRegisters[i]].whichString = registers[codeRegisters[j]].whichString;
             } else if (registers[codeRegisters[k]].isPointer == true) {
                 registers[codeRegisters[i]].isPointer = true;
                 registers[codeRegisters[i]].isChar = registers[codeRegisters[i]].isInt = false;
 
-                registers[codeRegisters[i]].index = constant;
+                registers[codeRegisters[i]].index = registers[codeRegisters[j]].val;
                 registers[codeRegisters[i]].whichString = registers[codeRegisters[k]].whichString;
             }
         } else if (code == 1) { /// lb
@@ -139,15 +140,23 @@ int main () {
             char currentRegister2;
             executabil.read (&currentRegister2, 1);
 
+            //std::cout << "lb: " << codeRegisters[currentRegister1] << ' ' << constant << ' ' << codeRegisters[currentRegister2] << '\n';
+            //std::cout << '\n';
+
             if (registers[codeRegisters[currentRegister2]].isPointer == true) {
-                std::cout << "sb:\n" << registers[codeRegisters[currentRegister2]].Pointer[constant] << '\n';
+                //std::cout << "sb:\n" << registers[codeRegisters[currentRegister2]].Pointer[constant] << '\n';
 
                 registers[codeRegisters[currentRegister1]].isChar = true;
                 registers[codeRegisters[currentRegister1]].isPointer = registers[codeRegisters[currentRegister1]].isInt = false;
 
                 int index = registers[codeRegisters[currentRegister2]].index;
-                registers[codeRegisters[currentRegister1]].car = registers[codeRegisters[currentRegister2]].Pointer[constant + index];
-                std::cout << registers[codeRegisters[currentRegister1]].car << '\n' << '\n';
+                int whichString = registers[codeRegisters[currentRegister2]].whichString;
+
+                if (constant + index < strings[whichString].size ())
+                    registers[codeRegisters[currentRegister1]].car = strings[whichString][constant + index];
+                else
+                    registers[codeRegisters[currentRegister1]].car = 0;
+                //std::cout << registers[codeRegisters[currentRegister1]].car << '\n' << '\n';
            }
         } else if (code == 80) { /// beqz
             char currentRegister;
@@ -155,6 +164,9 @@ int main () {
 
             short constant;
             executabil.read (reinterpret_cast<char *> (&constant), 2);
+
+           // std::cout << "beqz: " << registers[codeRegisters[currentRegister]].car << '\n';
+           // std::cout << '\n';
 
             if (registers[codeRegisters[currentRegister]].car == 0) {
                 executabil.seekp (constant, std::ios_base::beg);
@@ -178,10 +190,13 @@ int main () {
                 registers[codeRegisters[currentRegister1]].isPointer = true;
                 registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
 
-                registers[codeRegisters[currentRegister1]].index = registers[codeRegisters[currentRegister2]].index + 1;
+                registers[codeRegisters[currentRegister1]].index = registers[codeRegisters[currentRegister2]].index + constant;
+
+                //std::cout << "addi: " << registers[codeRegisters[currentRegister1]].index << '\n';
+                //std::cout << '\n';
                 //std::string help = registers[codeRegisters[currentRegister2]].Pointer;
                 //registers[codeRegisters[currentRegister1]].Pointer = help.erase (0, constant);
-            }
+            } 
         } else if (code == 64) { /// j
             short constant;
             executabil.read (reinterpret_cast<char *> (&constant), 2);
@@ -199,7 +214,7 @@ int main () {
                 registers[codeRegisters[currentRegister1]].isPointer = true;
                 registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
 
-                registers[codeRegisters[currentRegister1]].Pointer = registers[codeRegisters[currentRegister2]].Pointer;
+                registers[codeRegisters[currentRegister1]].index = registers[codeRegisters[currentRegister2]].index;
             } else if (registers[codeRegisters[currentRegister2]].isInt == true) {
                 registers[codeRegisters[currentRegister1]].isInt = true;
                 registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
@@ -218,17 +233,37 @@ int main () {
             executabil.read (&currentRegister2, 1);
             int j = currentRegister2;
 
+            //std::cout << "sb: " << codeRegisters[i] << ' ' << constanta << ' ' << codeRegisters[j] << '\n';
+
+            //std::cout << "Caracter: " << registers[codeRegisters[i]].car << '\n';
+
+            //std::cout << '\n';
+
             if (registers[codeRegisters[i]].isChar == true) {
                 registers[codeRegisters[j]].isPointer = true;
                 registers[codeRegisters[j]].isInt = registers[codeRegisters[i]].isChar = false;
 
                 int index = registers[codeRegisters[j]].index;
-                std::cout << "sb:\n" << registers[codeRegisters[i]].car << '\n';
-                if (constanta < registers[codeRegisters[j]].Pointer.size ())
-                    registers[codeRegisters[j]].Pointer[constanta + index] = registers[codeRegisters[i]].car;
-                else
-                    registers[codeRegisters[j]].Pointer += registers[codeRegisters[i]].car;
+                int whichString = registers[codeRegisters[j]].whichString;
+                char mutare = registers[codeRegisters[i]].car;
+
+               // std::cout << whichString << ' ' << constanta + index << ' ' << (int) mutare << '\n';
+
+                if (mutare != 0) {
+                    strings[whichString][constanta + index] = mutare;
+                    //std::cout << strings[whichString] << '\n';
+//                    for (int h = 0; h < strings[whichString].size (); h += 1)
+//                        std::cout << strings[whichString][h] << '\n';
+//                    std::cout << strings[whichString][constanta + index] << '\n';
+                } else {
+                   // std::cout << (int) mutare << '\n';
+                   // std::cout << constanta + index << '\n';
+
+                    int sfarsit = strings[whichString].size ();
+                    strings[whichString].erase (constanta + index, sfarsit);
+                }
             }
+            //std::cout << '\n';
         } else if (code == 82) { /// bge
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
@@ -243,10 +278,12 @@ int main () {
 
             if (registers[codeRegisters[currentRegister1]].val >= registers[codeRegisters[currentRegister2]].val)
                 executabil.seekp (constanta, std::ios_base::beg);
-        }
+        } else if ()
         executabil.read (&code, 1);
     }
 
-    std::cout << "Rezultat: " << registers["a0"].Pointer;
+    //std::cout << "Rezultat: " registers["a0"].val << '\n';
+    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
+    std::cout << "Rezultat: " << strings[registers["a0"].whichString];
     return 0;
 }
