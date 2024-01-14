@@ -1,13 +1,49 @@
-Proiect Asc
-Universitatea din Bucuresti
-Facultatea de Matematica si Informatica
 
-Echipa Punct-si-virgula
-Nita Alexandru 151
-Glod Cosmin-Stefan 151
-Birsan Gheorghe Daniel 151
+# ASAMBLOR ȘI EXECUTOR ARHITECTURA RISC
+  Proiect pentru Arhitectura Sistemelor de Calcul (Arhitectura Calculatoarelor), Facultatea de Matematică și Informatică, Secția Informatică, Universiatea din București, anul 2023-2024.
+  Proiect realizat de:
 
-Ce se intampla aici ?
 
-Asamblorul codifica instructiunile si le scrie intr-un fisier binar, urmand sa fie executate de catre executor.
-In acest repo se gasesc codificarile facute pentru instructiuni, registri si functiile din C.
+
+## Echipa Albăstrelele, seria 15, grupa 151
+
+- [@Andu9](https://github.com/Andu9) Nita Alexandru
+- [@cosmin371](https://github.com/cosmin371) Glod Cosmin-Stefan
+- [@danielbirsan](https://github.com/danielbirsan) Birsan Gheorghe Daniel
+
+## Despre
+-Asamblorul codifica instructiunile si le scrie intr-un fisier binar, urmand sa fie executate de catre executor. In acest repo se gasesc codificarile facute pentru instructiuni, registri si functiile din C.
+
+
+##  Instalare si requirements
+
+- Compilator C: (GCC, Clang sau Microsoft Visual C++).
+- Editor de text sau IDE: (Code::Blocks, Visual Studio Cod).
+- Sistem de operare: linux/windows
+
++Binary viewer (ex: https://binary-viewer.en.softonic.com/download)
+
+
+## Testare
+
+Pentru testare s-au folosit următoarele fișiere sursă:
+
+https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
+
+
+## Rularea codului
+- Asamblor:
+To do
+- Executor:
+To do
+
+
+## Cerința Proiectului
+ Crearea unui standard de cod mașină și apoi un executor pentru fișierele binare generate
+- https://cs.unibuc.ro/~crusu/asc/Arhitectura%20Sistemelor%20de%20Calcul%20(ASC)%20-%20Proiect%200x00%202023.pdf
+
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
