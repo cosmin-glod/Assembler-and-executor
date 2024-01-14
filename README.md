@@ -12,13 +12,13 @@
 - [@danielbirsan](https://github.com/danielbirsan) Birsan Gheorghe Daniel
 
 ## Despre
--Asamblorul codifica instructiunile si le scrie intr-un fisier binar, urmand sa fie executate de catre executor. In acest repo se gasesc codificarile facute pentru instructiuni, registri si functiile din C.
+-Asamblorul codifica instructiunile si le scrie intr-un fisier binar, urmand sa fie executate de catre executor. In acest repo se gasesc codificarile facute pentru instructiuni, registri si functiile din C++.
 
 
 ##  Instalare si requirements
 
-- Compilator C: (GCC, Clang sau Microsoft Visual C++).
-- Editor de text sau IDE: (Code::Blocks, Visual Studio Cod).
+- Compilator C++: (GCC, Clang sau Microsoft Visual C++).
+- Editor de text sau IDE: (Code::Blocks, Visual Studio Code).
 - Sistem de operare: linux/windows
 
 +Binary viewer (ex: https://binary-viewer.en.softonic.com/download)
