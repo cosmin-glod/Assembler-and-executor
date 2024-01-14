@@ -1,4 +1,4 @@
----------INSTRUCTIUNI---------
+-----------INSTRUCTIUNI-----------
                                  HEX  DEC
 la - load immediate             - 00 - 0
 lb - load byte                  - 01 - 1
@@ -6,13 +6,13 @@ lw - load word (4 bytes)        - 02 - 2
 ld - load double word (8 bytes) - 03 - 3
 li - load address               - 04 - 4
 
-add  -  reg reg                 - 10 - 16
+add  -  reg reg addition        - 10 - 16
 addi -  reg const               - 11 - 17
-sub -                           - 12 - 18 
+sub -   reg reg substraction    - 12 - 18 
 
 sb - save byte(reg to mem)      - 20 - 32
 sd - save double(reg to mem)    - 21 - 33
-mv - move                       - 22 - 34
+mv - move reg <- reg            - 22 - 34
 
 slli - shift left logical imm   - 30 - 48
 srai - shift right aritm imm    - 31 - 49
@@ -43,19 +43,19 @@ fmv.s.x                         - 83 - -125
 fgt.s                           - 84 - -124
 flt.s                           - 85 - -123
 
-----------REGISTRI------------
+------------REGISTRI------------
 
      HEX  DEC
-zero-00 - 0
-ra - 01 - 1
-sp - 02 - 2
-gp - 03 - 3
-tp - 04 - 4
+zero-00 -  0
+ra - 01 -  1
+sp - 02 -  2
+gp - 03 -  3
+tp - 04 -  4
 
 t0 - 10 - 16
 t1 - 11 - 17
 t2 - 12 - 18
-..
+...
 t6 - 16 - 22
 
 s0 - 20 - 32
@@ -67,9 +67,7 @@ a0 - 30 - 48
 a1 - 31 - 49
 a2 - 32 - 50
 a3 - 33 - 51
-a4
-a5
-a6
+...
 a7 - 37 - 55
 
 ft0- 40 - 64
@@ -81,9 +79,9 @@ fa0- 50 - 80
 fa1- 51 - 81
 fa2- 52 - 82
 
----------FUNCTII DIN C----------
+----------FUNCTII DIN C----------
 
-         HEX DEC
+         HEX  DEC
 printf - 60 - 96
 scanf  - 61 - 97
 strlen - 70 - 112
@@ -91,11 +89,8 @@ cfunc  - 71 - 113
 
 
 ---------REGISTRII FOLOSITI-------
-
-speciali: sp ra
-
+--------IN CELE 12 PROGRAME-------
+registrii speciali: sp ra
 t: 0 1 2 3 4 5
 s: 1
 a: 0 1 2 3
-
-
