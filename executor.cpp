@@ -759,7 +759,7 @@ int main () {
 
             registers[codeRegisters[currentRegister1]].isDouble = 1;
             registers[codeRegisters[currentRegister1]].dval = registers[codeRegisters[currentRegister2]].dval * registers[codeRegisters[currentRegister3]].dval;
-        } else if (code == 115) {
+        } else if (code == 115) { /// fsqrt.d
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
 
@@ -768,6 +768,47 @@ int main () {
 
             registers[codeRegisters[currentRegister1]].isDouble = 1;
             registers[codeRegisters[currentRegister1]].dval = std::sqrt (registers[codeRegisters[currentRegister2]].dval);
+        } else if (code == 96) { /// flw
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
+            
+            int constanta;
+            executabil.read (reinterpret_cast<char *> (&constanta), 4);
+            
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
+            
+            int index = registers[codeRegisters[currentRegister2]].index;
+            int whichString = registers[codeRegisters[currentRegister2]].whichString;
+            
+            float valoare = arrayFloat[whichString][index + constanta];
+            
+            registers[codeRegisters[currentRegister1]].isDouble = 1;
+            registers[codeRegisters[currentRegister1]].dval = valoare;
+        } else if (code == -128) { /// fadd.s
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
+            
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
+            
+            char currentRegister3;
+            executabil.read (&currentRegister3, 1);
+            
+            registers[codeRegisters[currentRegister1]].isFloat = 1;
+            registers[codeRegisters[currentRegister1]].fval = registers[codeRegisters[currentRegister2]].fval + registers[codeRegisters[currentRegister3]].fval;
+        } else if (code == -127) { /// fmul.s
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
+            
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
+            
+            char currentRegister3;
+            executabil.read (&currentRegister3, 1);
+            
+            registers[codeRegisters[currentRegister1]].isFloat = 1;
+            registers[codeRegisters[currentRegister1]].fval = registers[codeRegisters[currentRegister2]].fval * registers[codeRegisters[currentRegister3]].fval;
         }
         //if (test == 34) {exit(0);}
 
