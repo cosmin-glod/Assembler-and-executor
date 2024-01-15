@@ -29,7 +29,7 @@ struct componenetsRegisters {
     bool isPointer = false;
 
     float fval;
-    bool isFloat;
+    bool isFloat = false;
 
     double dval;
     bool isDouble = false;
@@ -250,6 +250,7 @@ int main () {
 
             registers[codeRegisters[currentRegister]].isInt = true;
             registers[codeRegisters[currentRegister]].isChar = registers[codeRegisters[currentRegister]].isPointer = false;
+            registers[codeRegisters[currentRegister]].isDouble = registers[codeRegisters[currentRegister]].isFloat = false;
 
             registers[codeRegisters[currentRegister]].val = constant;
 
@@ -272,18 +273,21 @@ int main () {
             if (registers[codeRegisters[j]].isPointer == true) {
                 registers[codeRegisters[i]].isPointer = true;
                 registers[codeRegisters[i]].isChar = registers[codeRegisters[i]].isInt = false;
+                registers[codeRegisters[i]].isFloat = registers[codeRegisters[i]].isDouble = false;
 
                 registers[codeRegisters[i]].index = registers[codeRegisters[k]].val;
                 registers[codeRegisters[i]].whichString = registers[codeRegisters[j]].whichString;
             } else if (registers[codeRegisters[k]].isPointer == true) {
                 registers[codeRegisters[i]].isPointer = true;
                 registers[codeRegisters[i]].isChar = registers[codeRegisters[i]].isInt = false;
+                registers[codeRegisters[i]].isFloat = registers[codeRegisters[i]].isDouble = false;
 
                 registers[codeRegisters[i]].index = registers[codeRegisters[j]].val;
                 registers[codeRegisters[i]].whichString = registers[codeRegisters[k]].whichString;
             } else if (registers[codeRegisters[j]].isInt == true && registers[codeRegisters[k]].isInt == true) {
                 registers[codeRegisters[i]].isInt = true;
                 registers[codeRegisters[i]].isChar = registers[codeRegisters[i]].isPointer = false;
+                registers[codeRegisters[i]].isFloat = registers[codeRegisters[i]].isDouble = false;
 
                 registers[codeRegisters[i]].val = registers[codeRegisters[j]].val + registers[codeRegisters[k]].val;
             }
@@ -309,6 +313,7 @@ int main () {
                 //std::cout << registers[codeRegisters[currentRegister1]].isChar << '\n';
 
                 registers[codeRegisters[currentRegister1]].isPointer = registers[codeRegisters[currentRegister1]].isInt = false;
+                registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
 
                 int index = registers[codeRegisters[currentRegister2]].index;
                 int whichString = registers[codeRegisters[currentRegister2]].whichString;
@@ -373,11 +378,13 @@ int main () {
                 if (registers[codeRegisters[currentRegister2]].isInt == true) {
                     registers[codeRegisters[currentRegister1]].isInt = true;
                     registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
+                    registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
 
                     registers[codeRegisters[currentRegister1]].val = registers[codeRegisters[currentRegister2]].val + constant;
                 } else if (registers[codeRegisters[currentRegister2]].isPointer == true) {
                     registers[codeRegisters[currentRegister1]].isPointer = true;
                     registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
+                    registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
 
                     registers[codeRegisters[currentRegister1]].index = registers[codeRegisters[currentRegister2]].index + constant;
 
@@ -408,12 +415,14 @@ int main () {
             if (registers[codeRegisters[currentRegister2]].isPointer == true) {
                 registers[codeRegisters[currentRegister1]].isPointer = true;
                 registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
+                registers[codeRegisters[currentRegister1]].isDouble = registers[codeRegisters[currentRegister1]].isFloat = false;
 
                 registers[codeRegisters[currentRegister1]].index = registers[codeRegisters[currentRegister2]].index;
                 registers[codeRegisters[currentRegister1]].whichString = registers[codeRegisters[currentRegister2]].whichString;
             } else if (registers[codeRegisters[currentRegister2]].isInt == true) {
                 registers[codeRegisters[currentRegister1]].isInt = true;
                 registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
+                registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
 
                 registers[codeRegisters[currentRegister1]].val = registers[codeRegisters[currentRegister2]].val;
             }
@@ -438,6 +447,7 @@ int main () {
             if (registers[codeRegisters[i]].isChar == true) {
                 registers[codeRegisters[j]].isPointer = true;
                 registers[codeRegisters[j]].isInt = registers[codeRegisters[i]].isChar = false;
+                registers[codeRegisters[j]].isFloat = registers[codeRegisters[i]].isDouble = false;
 
                 //std::cout << "sb: " << registers[codeRegisters[i]].car << '\n';
 
@@ -504,6 +514,7 @@ int main () {
             } else if (registers[codeRegisters[currentRegister1]].isInt == true) {
                 registers[codeRegisters[currentRegister2]].isPointer = true;
                 registers[codeRegisters[currentRegister2]].isChar = registers[codeRegisters[currentRegister2]].isInt = false;
+                registers[codeRegisters[currentRegister2]].isFloat = registers[codeRegisters[currentRegister2]].isDouble = false;
 
                 int index = registers[codeRegisters[currentRegister2]].index;
                 int whichString = registers[codeRegisters[currentRegister2]].whichString;
@@ -532,6 +543,7 @@ int main () {
             if (Function == 112) { /// strlen
                 registers["a0"].isInt = true;
                 registers["a0"].isChar = registers["a0"].isPointer = false;
+                registers["a0"].isDouble = registers["a0"].isFloat = false;
 
                 int index = 0;
                 while (strings[registers["a0"].index][index] != '\0')
@@ -553,6 +565,7 @@ int main () {
 
             registers[codeRegisters[currentRegister1]].isInt = true;
             registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
+            registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
 
             registers[codeRegisters[currentRegister1]].val = (registers[codeRegisters[currentRegister2]].val >> constanta);
             //std::cout << registers[codeRegisters[currentRegister1]].val << '\n';
@@ -572,6 +585,7 @@ int main () {
             if (registers[codeRegisters[j]].isInt == true) {
                 registers[codeRegisters[i]].isInt = true;
                 registers[codeRegisters[i]].isChar = registers[codeRegisters[i]].isPointer = false;
+                registers[codeRegisters[i]].isFloat = registers[codeRegisters[i]].isDouble = false;
 
                 registers[codeRegisters[i]].val = registers[codeRegisters[j]].val - registers[codeRegisters[k]].val;
             }
@@ -592,6 +606,7 @@ int main () {
             } else if (registers[codeRegisters[currentRegister2]].isPointer == true) {
                 registers[codeRegisters[currentRegister1]].isInt = true;
                 registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
+                registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
 
                 int index = registers[codeRegisters[currentRegister2]].index;
                 int whichString = registers[codeRegisters[currentRegister2]].whichString;
@@ -613,7 +628,7 @@ int main () {
 
             registers[codeRegisters[currentRegister1]].isInt = true;
             registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
-
+            registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
 
             registers[codeRegisters[currentRegister1]].val = (registers[codeRegisters[currentRegister2]].val << constant);
             //std::cout << registers[codeRegisters[currentRegister1]].val << '\n';
@@ -630,6 +645,7 @@ int main () {
             if (registers[codeRegisters[currentRegister2]].isPointer == true) {
                 registers[codeRegisters[currentRegister1]].isInt = true;
                 registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
+                registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
 
                 int index = registers[codeRegisters[currentRegister2]].index;
                 int whichString = registers[codeRegisters[currentRegister2]].whichString;
@@ -683,6 +699,8 @@ int main () {
             executabil.read (&currentRegister2, 1);
 
             registers[codeRegisters[currentRegister1]].isFloat = true;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
+            registers[codeRegisters[currentRegister1]].isPointer = registers[codeRegisters[currentRegister1]].isDouble = false;
             registers[codeRegisters[currentRegister1]].fval = registers[codeRegisters[currentRegister2]].fval;
 
             //std::cout << "fmv.s: " << registers[codeRegisters[currentRegister1]].fval << '\n';
@@ -700,6 +718,9 @@ int main () {
             float float2 = registers[codeRegisters[currentRegister3]].fval;
 
             registers[codeRegisters[currentRegister1]].isInt = true;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
+            registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
+
             registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
 
             registers[codeRegisters[currentRegister1]].val = (float1 > float2);
@@ -721,6 +742,8 @@ int main () {
             float float2 = registers[codeRegisters[currentRegister3]].fval;
 
             registers[codeRegisters[currentRegister1]].isInt = true;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
+            registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
             registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
 
             registers[codeRegisters[currentRegister1]].val = (float1 < float2);
@@ -743,6 +766,7 @@ int main () {
             if (registers[codeRegisters[currentRegister1]].isFloat == true) {
                 registers[codeRegisters[currentRegister2]].isPointer = true;
                 registers[codeRegisters[currentRegister2]].isChar = registers[codeRegisters[currentRegister2]].isFloat = registers[codeRegisters[currentRegister2]].isInt = false;
+                registers[codeRegisters[currentRegister2]].isDouble = false;
 
 
                 int index = registers[codeRegisters[currentRegister2]].index;
@@ -785,7 +809,9 @@ int main () {
             int index = registers[codeRegisters[currentRegister2]].index;
             int whichString = registers[codeRegisters[currentRegister2]].whichString;
 
-            registers[codeRegisters[currentRegister1]].isDouble = 1;
+            registers[codeRegisters[currentRegister1]].isDouble = true;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
+            registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
             registers[codeRegisters[currentRegister1]].dval = arrayDouble[whichString][index + constanta];
 
             //std::cout << registers[codeRegisters[currentRegister1]].dval << '\n';
@@ -800,8 +826,11 @@ int main () {
             executabil.read (&currentRegister3, 1);
 
             registers[codeRegisters[currentRegister1]].isDouble = 1;
+            registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
+
             registers[codeRegisters[currentRegister1]].dval = registers[codeRegisters[currentRegister2]].dval - registers[codeRegisters[currentRegister3]].dval;
-        } else if (code == 112) { /// fadd.s
+        } else if (code == 112) { /// fadd.d
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
 
@@ -812,6 +841,8 @@ int main () {
             executabil.read (&currentRegister3, 1);
 
             registers[codeRegisters[currentRegister1]].isDouble = 1;
+            registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
             registers[codeRegisters[currentRegister1]].dval = registers[codeRegisters[currentRegister2]].dval + registers[codeRegisters[currentRegister3]].dval;
         } else if (code == 114) { /// fmul.d
             char currentRegister1;
@@ -824,6 +855,8 @@ int main () {
             executabil.read (&currentRegister3, 1);
 
             registers[codeRegisters[currentRegister1]].isDouble = 1;
+            registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
             registers[codeRegisters[currentRegister1]].dval = registers[codeRegisters[currentRegister2]].dval * registers[codeRegisters[currentRegister3]].dval;
         } else if (code == 115) { /// fsqrt.d
             char currentRegister1;
@@ -833,6 +866,8 @@ int main () {
             executabil.read (&currentRegister2, 1);
 
             registers[codeRegisters[currentRegister1]].isDouble = 1;
+            registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
             registers[codeRegisters[currentRegister1]].dval = std::sqrt (registers[codeRegisters[currentRegister2]].dval);
         } else if (code == 96) { /// flw
             char currentRegister1;
@@ -850,6 +885,8 @@ int main () {
             float valoare = arrayFloat[whichString][index + constanta];
 
             registers[codeRegisters[currentRegister1]].isFloat = 1;
+            registers[codeRegisters[currentRegister1]].isDouble = registers[codeRegisters[currentRegister1]].isPointer = false;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
             registers[codeRegisters[currentRegister1]].fval = valoare;
 
             //std::cout << "flw: " << codeRegisters[currentRegister1] << ' ' << registers[codeRegisters[currentRegister1]].fval << '\n';
@@ -864,6 +901,8 @@ int main () {
             executabil.read (&currentRegister3, 1);
 
             registers[codeRegisters[currentRegister1]].isFloat = 1;
+            registers[codeRegisters[currentRegister1]].isDouble = registers[codeRegisters[currentRegister1]].isPointer = false;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
             registers[codeRegisters[currentRegister1]].fval = registers[codeRegisters[currentRegister2]].fval + registers[codeRegisters[currentRegister3]].fval;
 
             //std::cout << "fadd.s " << registers["fa0"].fval << '\n';
@@ -883,6 +922,8 @@ int main () {
 
 
             registers[codeRegisters[currentRegister1]].isFloat = 1;
+            registers[codeRegisters[currentRegister1]].isDouble = registers[codeRegisters[currentRegister1]].isPointer = false;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
 
            // std::cout << codeRegisters[currentRegister2] << ' ' << registers[codeRegisters[currentRegister2]].fval << '\n';
            // std::cout << codeRegisters[currentRegister3] << ' ' << registers[codeRegisters[currentRegister3]].fval << '\n';
@@ -909,6 +950,8 @@ int main () {
             executabil.read (&currentRegister2, 1);
 
             registers[codeRegisters[currentRegister1]].isFloat = 1;
+            registers[codeRegisters[currentRegister1]].isDouble = registers[codeRegisters[currentRegister1]].isPointer = false;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
             registers[codeRegisters[currentRegister1]].fval = float (registers[codeRegisters[currentRegister2]].val);
 
             //std::cout << "fmv.s.x: " << codeRegisters[currentRegister1] << ' ' << codeRegisters[currentRegister2] << '\n';
@@ -933,23 +976,25 @@ int main () {
             int index = it.second.index;
             int whichString = it.second.whichString;
             if (arrayDouble.size () > 0) {
-                for (int i = 0; i < arrayDouble[whichString].size (); i += 1)
+                for (int i = 0; i < arrayDouble[whichString].size (); i += 8)
                     std::cout << arrayDouble[whichString][i] << ' ';
             } else if (arrayFloat.size () > 0) {
-                for (int i = 0; i < arrayFloat[whichString].size (); i += 1)
+                for (int i = 0; i < arrayFloat[whichString].size (); i += 4)
                     std::cout << arrayFloat[whichString][i] << ' ';
             } else if (arrayInt.size () > 0) {
-                for (int i = 0; i < arrayInt.size (); i += 1)
+                for (int i = 0; i < arrayInt[whichString].size (); i += 4)
                     std::cout << arrayInt[whichString][i] << ' ';
             } else if (arrayLong.size () > 0) {
-                for (int i = 0; i < arrayLong.size (); i += 1)
+                for (int i = 0; i < arrayLong[whichString].size (); i += 8)
                     std::cout << arrayLong[whichString][i] << ' ';
             } else if (arrayShort.size () > 0) {
-                for (int i = 0; i < arrayShort.size (); i += 1)
+                for (int i = 0; i < arrayShort[whichString].size (); i += 8)
                     std::cout << arrayShort[whichString][i] << ' ';
+            } else if (strings.size () > 0) {
+                std::cout << strings[whichString];
             }
         }
-        std::cout << '\n'
+        std::cout << '\n';
     }
 ////
 ////   // std::cout << "Rezultat: " << registers["a0"].val << '\n';
