@@ -11,10 +11,16 @@
 const int nMax = 1e6 + 1;
 
 std::ifstream fin("nume_fisier.in");
+std::ofstream fout("nume_fisier.out");
+
 std::fstream executabil("executabil.bin", std::ios::in | std::ios::binary);
 
 bool isNumeric (char a) {
     return (a >= '0' && a <= '9');
+}
+
+int cfunc (int a, int b, int c) {
+    return a + b * c;
 }
 
 struct componenetsRegisters {
@@ -221,12 +227,7 @@ int main () {
 
     registers["zero"].isInt = true;
     registers["zero"].val = 0;
-/*
-    codeFunctions[112] = "strlen";
-    codeFunctions[96] = "printf";
-    codeFunctions[97] = "scanf";
-    codeFunctions[113] = "cfunc";
-*/
+
 
 
 
@@ -374,6 +375,9 @@ int main () {
                     while (constant > 0)
                         Stack.pop_back (), constant -= 1;
                 }
+            } else if (currentRegister2 == 2) { /// sp
+                constant /= 8;
+                Stack[constant] = registers[codeRegisters[currentRegister1]];
             } else {
                 if (registers[codeRegisters[currentRegister2]].isInt == true) {
                     registers[codeRegisters[currentRegister1]].isInt = true;
@@ -552,6 +556,42 @@ int main () {
                 //std::cout <<
                 //std::cout << "Sir: " << strings[registers["a0"].index] << '\n';
                 registers["a0"].val = strings[registers["a0"].whichString].size ();
+            } else if (Function == 96) { /// printf
+                int nrProcent = 0;
+                for (int i = 0; i < strings[registers["a0"].whichString].size (); i += 1)
+                    nrProcent += (strings[registers["a0"].whichString][i] == '%');
+                if (nrProcent == 0)
+                    std::cout << strings[registers["a0"].whichString];
+                else if (nrProcent == 1) {
+                    const char * help = strings[registers["a0"].whichString].c_str ();
+                    printf (help, registers["a1"].val);
+                }
+            } else if (Function == 97) { /// scanf
+                int Size = Stack.size ();
+
+                Stack[Size - 1].isInt = true;
+                Stack[Size - 1].isChar = Stack[Size - 1].isPointer = false;
+                Stack[Size - 1].isFloat = Stack[Size - 1].isDouble = false;
+
+                Stack[Size - 2].isInt = true;
+                Stack[Size - 2].isChar = Stack[Size - 1].isPointer = false;
+                Stack[Size - 2].isFloat = Stack[Size - 1].isDouble = false;
+
+
+                Stack[Size - 3].isInt = true;
+                Stack[Size - 3].isChar = Stack[Size - 1].isPointer = false;
+                Stack[Size - 3].isFloat = Stack[Size - 1].isDouble = false;
+
+                const char * help = strings[registers["a0"].whichString].c_str ();
+                scanf (help, &Stack[Size - 3].val, &Stack[Size - 2].val, &Stack[Size - 1].val);
+            } else if (Function == 113) { /// cfunc
+                int res = cfunc (registers["a0"].val, registers["a1"].val, registers["a2"].val);
+
+                registers["a0"].isInt = true;
+                registers["a0"].isChar = registers["a0"].isPointer = false;
+                registers["a0"].isFloat = registers["a0"].isDouble = false;
+
+                registers["a0"].val = res;
             }
         } else if (code == 49) { /// srai
             char currentRegister1;
@@ -642,7 +682,10 @@ int main () {
             char currentRegister2;
             executabil.read (&currentRegister2, 1);
 
-            if (registers[codeRegisters[currentRegister2]].isPointer == true) {
+            if (codeRegisters[currentRegister2] == "sp") {
+                constant /= 8;
+                registers[codeRegisters[currentRegister1]] = Stack[constant];
+            } else if (registers[codeRegisters[currentRegister2]].isPointer == true) {
                 registers[codeRegisters[currentRegister1]].isInt = true;
                 registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
                 registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isDouble = false;
@@ -956,6 +999,30 @@ int main () {
 
             //std::cout << "fmv.s.x: " << codeRegisters[currentRegister1] << ' ' << codeRegisters[currentRegister2] << '\n';
             //std::cout << "         " << registers[codeRegisters[currentRegister1]].fval << '\n';
+        } else if (code == -1) { /// .asciz
+            std::string String;
+
+            char caracter;
+            executabil.read (&caracter, 1);
+
+            while (caracter != 0) {
+                String += caracter;
+                executabil.read (&caracter, 1);
+            }
+            strings.emplace_back (String);
+        } else if (code == 0) { /// la
+            char currentRegister;
+            executabil.read (&currentRegister, 1);
+
+            char nrString;
+            executabil.read (&nrString, 1);
+
+            registers[codeRegisters[currentRegister]].isPointer = true;
+            registers[codeRegisters[currentRegister]].isChar = registers[codeRegisters[currentRegister]].isInt = false;
+            registers[codeRegisters[currentRegister]].isFloat = registers[codeRegisters[currentRegister]].isDouble = false;
+
+            registers[codeRegisters[currentRegister]].index = 0;
+            registers[codeRegisters[currentRegister]].whichString = nrString;
         }
         //if (test == 34) {exit(0);}
 
@@ -963,67 +1030,41 @@ int main () {
     }
 
     for (auto it : registers) {
-        std::cout << it.first << ": ";
+        if (it.first == "sp" || it.first == "ra" || it.first == "zero")
+            continue;
+
+        fout << it.first << ": ";
         if (it.second.isInt)
-            std::cout << it.second.val;
+            fout << it.second.val;
         else if (it.second.isChar)
-            std::cout << it.second.car;
+            fout << it.second.car;
         else if (it.second.isFloat)
-            std::cout << it.second.fval;
+            fout << it.second.fval;
         else if (it.second.isDouble)
-            std::cout << it.second.dval;
+            fout << it.second.dval;
         else if (it.second.isPointer) {
             int index = it.second.index;
             int whichString = it.second.whichString;
             if (arrayDouble.size () > 0) {
                 for (int i = 0; i < arrayDouble[whichString].size (); i += 8)
-                    std::cout << arrayDouble[whichString][i] << ' ';
+                    fout << arrayDouble[whichString][i] << ' ';
             } else if (arrayFloat.size () > 0) {
                 for (int i = 0; i < arrayFloat[whichString].size (); i += 4)
-                    std::cout << arrayFloat[whichString][i] << ' ';
+                    fout << arrayFloat[whichString][i] << ' ';
             } else if (arrayInt.size () > 0) {
                 for (int i = 0; i < arrayInt[whichString].size (); i += 4)
-                    std::cout << arrayInt[whichString][i] << ' ';
+                    fout << arrayInt[whichString][i] << ' ';
             } else if (arrayLong.size () > 0) {
                 for (int i = 0; i < arrayLong[whichString].size (); i += 8)
-                    std::cout << arrayLong[whichString][i] << ' ';
+                    fout << arrayLong[whichString][i] << ' ';
             } else if (arrayShort.size () > 0) {
                 for (int i = 0; i < arrayShort[whichString].size (); i += 8)
-                    std::cout << arrayShort[whichString][i] << ' ';
+                    fout << arrayShort[whichString][i] << ' ';
             } else if (strings.size () > 0) {
-                std::cout << strings[whichString];
+                fout << strings[whichString];
             }
         }
-        std::cout << '\n';
+        fout << '\n';
     }
-////
-////   // std::cout << "Rezultat: " << registers["a0"].val << '\n';
-////    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
-////    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
-////    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
-////    //std::cout << "Rezultat: " << registers["t0"].val;
-////    //std::cout << "Rezultat: ";
-//////    for (int i = 0; i < arrayLong[0].size (); i += 1)
-//////        std::cout << arrayLong[0][i] << ' ';
-////
-////    //std::cout << "Rezultat: " << registers["a0"].val << '\n';
-////
-//////    int index = registers["a0"].index;
-//////    int whichString = registers["a0"].whichString;
-//////    for (int i = 0; i < arrayFloat[whichString].size (); i += 1) {
-//////        std::cout << arrayFloat[whichString][i] << ' ';
-//////    }
-//////
-//////    index = registers["a1"].index;
-//////    whichString = registers["a1"].whichString;
-//////    for (int i = 0; i < arrayFloat[whichString].size (); i += 1) {
-//////        std::cout << arrayFloat[whichString][i] << ' ';
-//////    }
-////
-////    //std::cout << registers["fa0"].dval;
-////
-//////    for (int i = 0; i < 3 * 4; i += 4)
-//////        std::cout << arrayFloat[registers["a0"].whichString][i] << ' ';
-
     return 0;
 }
