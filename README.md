@@ -107,7 +107,7 @@ a1 LL* 5 [elementul ce este adăugat in lista]
 cat nume_fisier.out
  
  ```
--se afișează pe ecran starea registrilor folosiți în program, cu exceptia regiștrilor sb, ra si zero (pentru registrii în care o adresa, vom afișa conținutul din memorie)
+-se afișează pe ecran starea registrilor folosiți în program, cu exceptia regiștrilor sb, ra si zero (pentru registrii în care se afla o adresa, vom afișa conținutul din memorie incepand de la adresa respectiva)
 
 
 ## Cerința Proiectului
