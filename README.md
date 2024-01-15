@@ -52,6 +52,21 @@ Coordinate& pentru struct Coordinate
 float pentru float
 float& pentru float&
 LL* pentru LL* 
+
+a0 string abcd
+a1 int 78
+fa0 float -5.6
+a1 float& 2.3 1.2
+a0 arrayInt 5 3 -4 1
+a1 arrayLong 10 4 -5 -3 0
+a2 arrayFloat 1.2 5.2 -80.4
+a2 arrayFloat& 3.4
+a1 arrayDouble 6.4
+a0 Coordinate& 3.5 -4.7
+a2 LL* 1 2 3 [lista unde pozitia de start este prima valoare]
+a1 LL* 5 [elementul ce este adaugat in lista]
+
+
 arrayFloat pentru float a[], float matrice[][]
 - se ruleaza comanda "./executor" in terminalul cu sursa
 - dupa executare in fisierul "nume_fisier.out" se va afla starea finala a registrilor
