@@ -62,8 +62,8 @@ g++ executor.cpp -o executor
  
  ```
 
-- în fișierul <b>"nume_fisier.in"</b> trebuie să se afle starea inițială a regiștrilor sub forma
-  <p><b> nume_registru tipul_de_date valoare </b>  separate prin câte un spațiu </p>
+- în fișierul <b>"stare_initala.in"</b> trebuie să se afle starea inițială a regiștrilor sub forma
+  <p><b> nume_registru tipul_de_date valoare </b>  separate prin câte un spațiu (Daca registrul memoreaza adresa unui sir de caracter, al unui vector sau al nodului start dintr-o lista simplu inlantuita, in fisier se va completa intreaga structura.) </p>
 - <b>string</b> pentru <b>const char *</b>sau <b>char *</b>
 - <b>int</b> pentru <b>unsigned long, int </b>
 - <b>arrayInt </b> pentru <b> int arr[], const int arr[] </b>
