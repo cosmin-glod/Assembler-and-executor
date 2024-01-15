@@ -122,9 +122,6 @@ cat nume_fisier.out
 - [Cum scriem/citim un fisier binar?](https://medium.com/@zekumoru/how-to-work-with-binary-files-in-c-520a852ee04a)
 
 
-## Cum scriem/citim un fisier binar ?
-https://medium.com/@zekumoru/how-to-work-with-binary-files-in-c-520a852ee04a#:~:text=Binary%20Operations,binary%20%7C%20ios%3A%3A%20trunc)%3B
-
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
