@@ -33,10 +33,10 @@ https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
 
 ## Rularea codului
 - Asamblor:
-------LINUX-----
-- se descarca codul sursa
-- se ruleaza comanda "g++ asamblor.cpp -o asamblor" in terminal in folderul cu sursa
-- in fisierul "input.in" se pune programul in assembly risc-v ce urmeaza a fi asamblat
+- -----LINUX-----
+-- se descarca codul sursa
+-- se ruleaza comanda "g++ asamblor.cpp -o asamblor" in terminal in folderul cu sursa
+-- in fisierul "input.in" se pune programul in assembly risc-v ce urmeaza a fi asamblat
 - se ruleaza comanda "./asamblor"
 - in fisierul "executabil.bin" se afla binarul din urma executarii
 - Executor:
