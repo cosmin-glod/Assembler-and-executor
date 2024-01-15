@@ -130,12 +130,16 @@ int main () {
             registers[currentRegister].isFloat = 1;
             registers[currentRegister].fval = valoare;
         } else if (dataType == "float&" || dataType == "arrayFloat") {
+            //std::cout << currentRegister << ' ' << dataType << ' ';
+
             std::istringstream citireFloat(content);
             std::vector<float> help;
 
             float valoare;
-            while (citireFloat >> valoare)
+            while (citireFloat >> valoare) {
                 help.emplace_back (valoare);
+                help.emplace_back (0), help.emplace_back (0), help.emplace_back (0);
+            }
 
             arrayFloat.emplace_back (help);
 
@@ -162,6 +166,13 @@ int main () {
             registers[currentRegister].index = 0;
         }
     }
+
+//    for (int i = 0; i < arrayFloat[registers["a1"].whichString].size (); i += 4)
+//        std::cout << arrayFloat[registers["a1"].whichString][i] << ' ';
+//    std::cout << '\n';
+//    for (int i = 0; i < arrayFloat[registers["a2"].whichString].size (); i += 4)
+//        std::cout << arrayFloat[registers["a2"].whichString][i] << ' ';
+//    std::cout << '\n';
 
     codeRegisters[0] = "zero";
     codeRegisters[1] = "ra";
@@ -190,6 +201,8 @@ int main () {
     codeRegisters[81] = "fa1";
     codeRegisters[82] = "fa2";
 
+    registers["zero"].isInt = true;
+    registers["zero"].val = 0;
 /*
     codeFunctions[112] = "strlen";
     codeFunctions[96] = "printf";
@@ -213,7 +226,9 @@ int main () {
     executabil.read (&code, 1);
     while (code != 66) {
         test += 1;
-        //std::cout << (int) code << ' ';
+        //std::cout << (int) code << " ft0: " << registers["ft0"].fval << '\n';
+        //std::cout << std::hex << code << '\n';
+        //std::cout << std::dec << registers["ft0"].fval << '\n';
         if (code == 4) { /// li
             char currentRegister;
             executabil.read (&currentRegister, 1);
@@ -226,6 +241,8 @@ int main () {
             registers[codeRegisters[currentRegister]].isChar = registers[codeRegisters[currentRegister]].isPointer = false;
 
             registers[codeRegisters[currentRegister]].val = constant;
+
+            //std::cout << "li: " << codeRegisters[currentRegister] << ' ' << registers[codeRegisters[currentRegister]].val << '\n';
        } else if (code == 16) { /// add
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
@@ -444,10 +461,15 @@ int main () {
             short constanta;
             executabil.read (reinterpret_cast<char *> (&constanta), 2);
 
-            //std::cout << "bge: " << registers[codeRegisters[currentRegister1]].val << ' ' << registers[codeRegisters[currentRegister2]].val << '\n';
+//            std::cout << "bge: \n";
+//            std::cout << "    " << codeRegisters[currentRegister1] << ' ' << registers[codeRegisters[currentRegister1]].val << '\n';
+//            std::cout << "    " << codeRegisters[currentRegister2] << ' ' << registers[codeRegisters[currentRegister2]].val << '\n';
+//            std::cout << "    " << (registers[codeRegisters[currentRegister1]].val >= registers[codeRegisters[currentRegister2]].val) << '\n';
 
             if (registers[codeRegisters[currentRegister1]].val >= registers[codeRegisters[currentRegister2]].val)
                 executabil.seekp (constanta, std::ios_base::beg);
+//            if (registers[codeRegisters[currentRegister1]].fval >= registers[codeRegisters[currentRegister2]].fval)
+//                executabil.seekp (constanta, std::ios_base::beg);
         } else if (code == 33) { /// sd
             //std::cout << "got here\n";
 
@@ -635,7 +657,7 @@ int main () {
             registers[codeRegisters[currentRegister1]].isFloat = true;
             registers[codeRegisters[currentRegister1]].fval = registers[codeRegisters[currentRegister2]].fval;
 
-            std::cout << "fmv.s: " << registers[codeRegisters[currentRegister1]].fval << '\n';
+            //std::cout << "fmv.s: " << registers[codeRegisters[currentRegister1]].fval << '\n';
         } else if (code == -124) { /// fgt.s
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
@@ -701,10 +723,28 @@ int main () {
 
                 //std::cout << whichString << ' ' << index + constant << ' ' << valoare << '\n';
 
-                if (index + constant < arrayFloat[whichString].size ())
+                std::cout << valoare << ' ' << index + constant << '\n';
+                std::cout << arrayFloat[whichString].size () << '\n';
+
+                if (index + constant < arrayFloat[whichString].size ()) {
                     arrayFloat[whichString][index + constant] = valoare;
-                else
+                    if (index + constant + 1 < arrayFloat[whichString].size ())
+                        arrayFloat[whichString][index + constant + 1] = 0;
+                    else
+                        arrayFloat[whichString].emplace_back (0);
+                    if (index + constant + 2 < arrayFloat[whichString].size ())
+                        arrayFloat[whichString][index + constant + 2] = 0;
+                    else
+                        arrayFloat[whichString].emplace_back (0);
+                    if (index + constant + 3 < arrayFloat[whichString].size ())
+                        arrayFloat[whichString][index + constant + 3] = 0;
+                    else
+                        arrayFloat[whichString].emplace_back (0);
+                }
+                else {
                     arrayFloat[whichString].emplace_back (valoare);
+                    arrayFloat[whichString].emplace_back (0), arrayFloat[whichString].emplace_back (0), arrayFloat[whichString].emplace_back (0);
+                }
             }
         } else if (code == 97) { /// fld
             char currentRegister1;
@@ -771,44 +811,82 @@ int main () {
         } else if (code == 96) { /// flw
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
-            
+
             int constanta;
             executabil.read (reinterpret_cast<char *> (&constanta), 4);
-            
+
             char currentRegister2;
             executabil.read (&currentRegister2, 1);
-            
+
             int index = registers[codeRegisters[currentRegister2]].index;
             int whichString = registers[codeRegisters[currentRegister2]].whichString;
-            
+
             float valoare = arrayFloat[whichString][index + constanta];
-            
-            registers[codeRegisters[currentRegister1]].isDouble = 1;
-            registers[codeRegisters[currentRegister1]].dval = valoare;
+
+            registers[codeRegisters[currentRegister1]].isFloat = 1;
+            registers[codeRegisters[currentRegister1]].fval = valoare;
+
+            //std::cout << "flw: " << codeRegisters[currentRegister1] << ' ' << registers[codeRegisters[currentRegister1]].fval << '\n';
         } else if (code == -128) { /// fadd.s
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
-            
+
             char currentRegister2;
             executabil.read (&currentRegister2, 1);
-            
+
             char currentRegister3;
             executabil.read (&currentRegister3, 1);
-            
+
             registers[codeRegisters[currentRegister1]].isFloat = 1;
             registers[codeRegisters[currentRegister1]].fval = registers[codeRegisters[currentRegister2]].fval + registers[codeRegisters[currentRegister3]].fval;
+
+            //std::cout << "fadd.s " << registers["fa0"].fval << '\n';
         } else if (code == -127) { /// fmul.s
+            //std::cout << "Test: " << registers["ft0"].fval << '\n';
+
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
-            
+
             char currentRegister2;
             executabil.read (&currentRegister2, 1);
-            
+
             char currentRegister3;
             executabil.read (&currentRegister3, 1);
-            
+
+            //std::cout << "Test2: " << registers["ft0"].fval << '\n';
+
+
             registers[codeRegisters[currentRegister1]].isFloat = 1;
+
+           // std::cout << codeRegisters[currentRegister2] << ' ' << registers[codeRegisters[currentRegister2]].fval << '\n';
+           // std::cout << codeRegisters[currentRegister3] << ' ' << registers[codeRegisters[currentRegister3]].fval << '\n';
+
             registers[codeRegisters[currentRegister1]].fval = registers[codeRegisters[currentRegister2]].fval * registers[codeRegisters[currentRegister3]].fval;
+
+           // std::cout << "Test3: " << registers["ft0"].fval << '\n';
+
+
+            //std::cout << "fmul.s: " << registers["ft0"].fval << '\n';
+//            std::cout << "       " << codeRegisters[currentRegister2] << ' ' << registers[codeRegisters[currentRegister2]].fval << '\n';
+//            std::cout << "       " << codeRegisters[currentRegister3] << ' ' << registers[codeRegisters[currentRegister3]].fval << '\n';
+
+//            std::cout << "fmul.s: ";
+//            std::cout << codeRegisters[currentRegister1] << ' ' << registers[codeRegisters[currentRegister1]].fval << '\n';
+//            std::cout << codeRegisters[currentRegister2] << ' ' << registers[codeRegisters[currentRegister2]].fval << '\n';
+//
+//            std::cout << '\n';
+        } else if (code == -125) { /// fmv.s.x
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
+
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
+
+            registers[codeRegisters[currentRegister1]].isFloat = 1;
+            registers[codeRegisters[currentRegister1]].fval = float (registers[codeRegisters[currentRegister2]].val);
+
+            //std::cout << "fmv.s.x: " << codeRegisters[currentRegister1] << ' ' << codeRegisters[currentRegister2] << '\n';
+            //std::cout << "         " << registers[codeRegisters[currentRegister1]].fval << '\n';
         }
         //if (test == 34) {exit(0);}
 
@@ -839,5 +917,8 @@ int main () {
 //    }
 
     //std::cout << registers["fa0"].dval;
+
+//    for (int i = 0; i < 3 * 4; i += 4)
+//        std::cout << arrayFloat[registers["a0"].whichString][i] << ' ';
     return 0;
 }
