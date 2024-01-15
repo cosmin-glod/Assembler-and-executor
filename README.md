@@ -21,7 +21,7 @@
 - Editor de text sau IDE: (Code::Blocks, Visual Studio Code).
 - Sistem de operare: linux/windows
 
-+Binary viewer (ex: https://binary-viewer.en.softonic.com/download)
++Binary viewer (ex: https://binary-viewer.en.softonic.com/download) (program folosit pentru deschiderea fisierelor in format binar pe Windows)
 
 
 ## Testare
