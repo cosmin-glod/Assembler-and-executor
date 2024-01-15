@@ -40,6 +40,13 @@ https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
 - se ruleaza comanda "./asamblor"
 - in fisierul "executabil.bin" se afla binarul din urma executarii
 - Executor:
+- se descarca codul sursa
+- se ruleaza comanda "g++ executor.cpp -o executor" in terminal in folderul cu sursa
+- in fisierul "nume_fisier.in" trebuie sa se afle starea initiala a registrilor sub forma
+-             nume_registru tipul_de_date valoare
+-             tipul de date trebuie sa fie una din urmatoarele: string, int, arrayInt, arrayFloat, arrayLong
+- se ruleaza comanda "./executor" in terminalul cu sursa
+- dupa executare in fisierul "nume_fisier.out" se va afla starea finala a registrilor
 To do
 
 
