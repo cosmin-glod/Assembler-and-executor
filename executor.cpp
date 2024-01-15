@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <sstream>
 #include <vector>
 #include <string>
 #include <cmath>
@@ -26,6 +27,9 @@ struct componenetsRegisters {
     int index;
     int whichString;
     bool isPointer = false;
+
+    float fval;
+    bool isFloat;
 };
 
 std::map<int, std::string> codeRegisters;
@@ -34,9 +38,9 @@ std::map<std::string, componenetsRegisters> registers;
 std::vector<componenetsRegisters> Stack;
 
 std::vector<std::string> strings;
-
 std::vector<std::vector<int>> arrayInt;
 std::vector<std::vector<long long>> arrayLong;
+std::vector<std::vector<float>> arrayFloat;
 
 int main () {
     while (!fin.eof ()) {
@@ -116,6 +120,20 @@ int main () {
             registers[currentRegister].index = 0;
             registers[currentRegister].whichString = arrayLong.size () - 1;
             registers[currentRegister].isPointer = true;
+        } else if (dataType == "float") {
+            float valoare = std::stof (content);
+
+            registers[currentRegister].isFloat = 1;
+            registers[currentRegister].fval = valoare;
+        } else if (dataType == "float&" || dataType == "arrayFloat") {
+            std::istringstream citireFloat(content);
+            std::vector<float> help;
+
+            float valoare;
+            while (citireFloat >> valoare)
+                help.emplace_back (valoare);
+
+            arrayFloat.emplace_back (help);
         }
     }
 
@@ -229,10 +247,18 @@ int main () {
                 int index = registers[codeRegisters[currentRegister2]].index;
                 int whichString = registers[codeRegisters[currentRegister2]].whichString;
 
-                if (constant + index < strings[whichString].size ())
-                    registers[codeRegisters[currentRegister1]].car = strings[whichString][constant + index];
-                else
+                //if (strings[whichString][constant])
+
+                if (strings[whichString][constant + index] == '@')
                     registers[codeRegisters[currentRegister1]].car = 0;
+                else
+                    registers[codeRegisters[currentRegister1]].car = strings[whichString][constant + index];
+
+//
+//                if (constant + index < strings[whichString].size ())
+//                    registers[codeRegisters[currentRegister1]].car = strings[whichString][constant + index];
+//                else
+//                    registers[codeRegisters[currentRegister1]].car = 0;
                 //std::cout << registers[codeRegisters[currentRegister1]].car << '\n' << '\n';
            }
         } else if (code == 80) { /// beqz
@@ -242,10 +268,12 @@ int main () {
             short constant;
             executabil.read (reinterpret_cast<char *> (&constant), 2);
 
-           // std::cout << "beqz: " << registers[codeRegisters[currentRegister]].car << '\n';
+            std::cout << "beqz: " << registers[codeRegisters[currentRegister]].car << '\n';
            // std::cout << '\n';
 
-            if (registers[codeRegisters[currentRegister]].car == 0) {
+            if (registers[codeRegisters[currentRegister]].isChar == true && registers[codeRegisters[currentRegister]].car == 0) {
+                executabil.seekp (constant, std::ios_base::beg);
+            } else if (registers[codeRegisters[currentRegister]].isInt == true && registers[codeRegisters[currentRegister]].val == 0) {
                 executabil.seekp (constant, std::ios_base::beg);
             }
         } else if (code == 17) { /// addi
@@ -298,7 +326,7 @@ int main () {
             char currentRegister2;
             executabil.read (&currentRegister2, 1);
 
-            //std::cout << registers[codeRegisters[currentRegister1]].val << ' ' << registers[codeRegisters[currentRegister2]].val << '\n';
+            std::cout << registers[codeRegisters[currentRegister1]].val << ' ' << registers[codeRegisters[currentRegister2]].val << '\n';
 
             if (registers[codeRegisters[currentRegister2]].isPointer == true) {
                 registers[codeRegisters[currentRegister1]].isPointer = true;
@@ -527,7 +555,7 @@ int main () {
 
             if (registers[codeRegisters[currentRegister1]].val <= registers[codeRegisters[currentRegister2]].val)
                 executabil.seekp (constanta, std::ios_base::beg);
-        } else if (code == 81) { /// bgt
+        } else if (code == 81) { /// bnez
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
 
@@ -536,7 +564,7 @@ int main () {
 
             if (registers[codeRegisters[currentRegister1]].val != 0)
                 executabil.seekg (constanta, std::ios_base::beg);
-        } else if (code == 83) {
+        } else if (code == 83) { /// bgt
             char currentRegister1;
             executabil.read (&currentRegister1, 1);
 
@@ -548,6 +576,69 @@ int main () {
 
             if (registers[codeRegisters[currentRegister1]].val > registers[codeRegisters[currentRegister2]].val)
                 executabil.seekg (constanta, std::ios_base::beg);
+        } else if (code == -126) { /// fmv.s
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
+
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
+
+            registers[codeRegisters[currentRegister1]].isFloat = true;
+            registers[codeRegisters[currentRegister1]].fval = registers[codeRegisters[currentRegister2]].fval;
+        } else if (code == -124) { /// fgt.s
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
+
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
+
+            char currentRegister3;
+            executabil.read (&currentRegister3, 1);
+
+            float float1 = registers[codeRegisters[currentRegister2]].fval;
+            float float2 = registers[codeRegisters[currentRegister3]].fval;
+
+            registers[codeRegisters[currentRegister1]].isInt = true;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
+
+            registers[codeRegisters[currentRegister1]].val = (float1 > float2);
+        } else if (code == -123) { /// flt.s
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
+
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
+
+            char currentRegister3;
+            executabil.read (&currentRegister3, 1);
+
+            float float1 = registers[codeRegisters[currentRegister2]].fval;
+            float float2 = registers[codeRegisters[currentRegister3]].fval;
+
+            registers[codeRegisters[currentRegister1]].isInt = true;
+            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
+
+            registers[codeRegisters[currentRegister1]].val = (float1 < float2);
+        } else if (code == 98) {
+            char currentRegister1;
+            executabil.read (&currentRegister1, 1);
+
+            int constant;
+            executabil.read (reinterpret_cast<char *> (&constant), 4);
+
+            char currentRegister2;
+            executabil.read (&currentRegister2, 1);
+
+            if (registers[codeRegisters[currentRegister1]].isFloat == true) {
+                registers[codeRegisters[currentRegister2]].isPointer = true;
+                registers[codeRegisters[currentRegister2]].isChar = registers[codeRegisters[currentRegister2]].isFloat = registers[codeRegisters[currentRegister2]].isInt = false;
+
+                int index = registers[codeRegisters[currentRegister2]].index;
+                int whichString = registers[codeRegisters[currentRegister2]].whichString;
+                float valoare = registers[codeRegisters[currentRegister1]].fval;
+
+                arrayFloat[whichString][index] = valoare;
+            }
         }
 
         //if (test == 34) {exit(0);}
@@ -555,7 +646,7 @@ int main () {
         executabil.read (&code, 1);
     }
 
-    //std::cout << "Rezultat: " registers["a0"].val << '\n';
+    std::cout << "Rezultat: " << registers["a0"].val << '\n';
     //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
     //std::cout << "Rezultat: " << strings[re   gisters["a0"].whichString];
     //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
@@ -564,6 +655,9 @@ int main () {
 //    for (int i = 0; i < arrayLong[0].size (); i += 1)
 //        std::cout << arrayLong[0][i] << ' ';
 
-    std::cout << "Rezultat: " << registers["a0"].val << '\n';
+    //std::cout << "Rezultat: " << registers["a0"].val << '\n';
+
+
+
     return 0;
 }
