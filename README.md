@@ -21,7 +21,8 @@
 - Editor de text sau IDE: (Code::Blocks, Visual Studio Code).
 - Sistem de operare: linux/windows
 
-+Binary viewer (ex: https://binary-viewer.en.softonic.com/download) (program folosit pentru deschiderea fisierelor in format binar pe Windows)
++Binary viewer (ex: https://binary-viewer.en.softonic.com/download)
++Pentru Linux puteti folosi bvi: "sudo apt-get -y install bvi"
 
 
 ## Testare
@@ -102,12 +103,12 @@ a1 LL* 5 [elementul ce este adăugat in lista]
  ```
 - dupa executare în fișierul <b>"nume_fisier.out"</b> se va află starea finală a regiștrilor
 
--se deschide fișierul folosind comanda:
+-se deschide fișierul folosit comanda:
  ```bash
 cat nume_fisier.out
  
  ```
--se afișează pe ecran starea registrilor folosiți în program, cu exceptia regiștrilor sb, ra si zero (pentru registrii în care se afla o adresa, vom afișa conținutul din memorie incepand de la adresa respectiva)
+-se afișează pe ecran starea registrilor folosiți în program, cu exceptia regiștrilor sb, ra si zero (pentru registrii în care o adresa, vom afișa conținutul din memorie)
 
 
 ## Cerința Proiectului
