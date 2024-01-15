@@ -175,7 +175,6 @@ int main () {
 
     while (!in.eof ()) {
         std::getline (in, line);
-        std::cout << line << '\n';
         int i  = 0;
         while (line[i] != NULL && line[i] == ' ') i += 1;
 
