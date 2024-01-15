@@ -45,6 +45,7 @@ std::vector<std::vector<int>> arrayInt;
 std::vector<std::vector<long long>> arrayLong;
 std::vector<std::vector<float>> arrayFloat;
 std::vector<std::vector<double>> arrayDouble;
+std::vector<std::vector<short>> arrayShort;
 
 int main () {
     while (!fin.eof ()) {
@@ -157,12 +158,29 @@ int main () {
                 help.emplace_back (0), help.emplace_back (0), help.emplace_back (0);
                 help.emplace_back (0);
             }
-                help.emplace_back (valoare);
 
             arrayDouble.emplace_back (help);
 
             registers[currentRegister].isPointer = 1;
             registers[currentRegister].whichString = arrayDouble.size () - 1;
+            registers[currentRegister].index = 0;
+        } else if (dataType == "LL*") {
+            std::istringstream citireLL(content);
+            std::vector<short> help;
+
+            short valoare;
+            while (citireLL >> valoare) {
+                help.emplace_back (valoare);
+                //std::cout << valoare << '\n';
+                help.emplace_back (0), help.emplace_back (0), help.emplace_back (0);
+                help.emplace_back (0), help.emplace_back (0), help.emplace_back (0);
+                help.emplace_back (0);
+            }
+
+            arrayShort.emplace_back (help);
+
+            registers[currentRegister].isPointer = 1;
+            registers[currentRegister].whichString = arrayShort.size () - 1;
             registers[currentRegister].index = 0;
         }
     }
@@ -210,13 +228,6 @@ int main () {
     codeFunctions[113] = "cfunc";
 */
 
-//    for (int i = 0; i < arrayDouble[registers["a0"].whichString].size (); i += 1)
-//        std::cout << arrayDouble[registers["a0"].whichString][i] << ' ';
-//
-//    std::cout << '\n';
-//
-//    for (int i = 0; i < arrayDouble[registers["a1"].whichString].size (); i += 1)
-//        std::cout << arrayDouble[registers["a1"].whichString][i] << ' ';
 
 
     char code;
@@ -390,6 +401,10 @@ int main () {
 
             //std::cout << registers[codeRegisters[currentRegister1]].val << ' ' << registers[codeRegisters[currentRegister2]].val << '\n';
 
+            if (registers[codeRegisters[currentRegister1]].isPointer == true && registers[codeRegisters[currentRegister2]].isPointer == true) {
+                registers[codeRegisters[currentRegister1]].whichString = registers[codeRegisters[currentRegister2]].whichString;
+            }
+
             if (registers[codeRegisters[currentRegister2]].isPointer == true) {
                 registers[codeRegisters[currentRegister1]].isPointer = true;
                 registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
@@ -495,6 +510,19 @@ int main () {
                 int valoare = registers[codeRegisters[currentRegister1]].val;
 
                 arrayLong[whichString][constanta + index] = valoare;
+            } else if (registers[codeRegisters[currentRegister1]].isPointer == true) {
+                int index1 = registers[codeRegisters[currentRegister1]].whichString;
+                int index2 = registers[codeRegisters[currentRegister2]].whichString;
+
+                arrayShort[index2].insert (arrayShort[index2].begin () + constanta, arrayShort[index1].begin (), arrayShort[index1].end ());
+
+//                for (int i = 0; i < arrayShort[registers["a0"].whichString].size (); i += 8)
+//                    std::cout << arrayShort[registers["a0"].whichString][i] << ' ';
+//                std::cout << '\n';
+//
+//                for (int i = 0; i < arrayShort[registers["a1"].whichString].size (); i += 8)
+//                    std::cout << arrayShort[registers["a1"].whichString][i] << ' ';
+//                std::cout << '\n';
             }
             //std::cout << codeRegisters[currentRegister1] << ' ' << constanta << ' ' << codeRegisters[currentRegister2] << '\n';
         } else if (code == 65) { /// call
@@ -723,8 +751,6 @@ int main () {
 
                 //std::cout << whichString << ' ' << index + constant << ' ' << valoare << '\n';
 
-                std::cout << valoare << ' ' << index + constant << '\n';
-                std::cout << arrayFloat[whichString].size () << '\n';
 
                 if (index + constant < arrayFloat[whichString].size ()) {
                     arrayFloat[whichString][index + constant] = valoare;
@@ -892,33 +918,34 @@ int main () {
 
         executabil.read (&code, 1);
     }
+////
+////   // std::cout << "Rezultat: " << registers["a0"].val << '\n';
+////    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
+////    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
+////    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
+////    //std::cout << "Rezultat: " << registers["t0"].val;
+////    //std::cout << "Rezultat: ";
+//////    for (int i = 0; i < arrayLong[0].size (); i += 1)
+//////        std::cout << arrayLong[0][i] << ' ';
+////
+////    //std::cout << "Rezultat: " << registers["a0"].val << '\n';
+////
+//////    int index = registers["a0"].index;
+//////    int whichString = registers["a0"].whichString;
+//////    for (int i = 0; i < arrayFloat[whichString].size (); i += 1) {
+//////        std::cout << arrayFloat[whichString][i] << ' ';
+//////    }
+//////
+//////    index = registers["a1"].index;
+//////    whichString = registers["a1"].whichString;
+//////    for (int i = 0; i < arrayFloat[whichString].size (); i += 1) {
+//////        std::cout << arrayFloat[whichString][i] << ' ';
+//////    }
+////
+////    //std::cout << registers["fa0"].dval;
+////
+//////    for (int i = 0; i < 3 * 4; i += 4)
+//////        std::cout << arrayFloat[registers["a0"].whichString][i] << ' ';
 
-   // std::cout << "Rezultat: " << registers["a0"].val << '\n';
-    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
-    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
-    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
-    //std::cout << "Rezultat: " << registers["t0"].val;
-    //std::cout << "Rezultat: ";
-//    for (int i = 0; i < arrayLong[0].size (); i += 1)
-//        std::cout << arrayLong[0][i] << ' ';
-
-    //std::cout << "Rezultat: " << registers["a0"].val << '\n';
-
-//    int index = registers["a0"].index;
-//    int whichString = registers["a0"].whichString;
-//    for (int i = 0; i < arrayFloat[whichString].size (); i += 1) {
-//        std::cout << arrayFloat[whichString][i] << ' ';
-//    }
-//
-//    index = registers["a1"].index;
-//    whichString = registers["a1"].whichString;
-//    for (int i = 0; i < arrayFloat[whichString].size (); i += 1) {
-//        std::cout << arrayFloat[whichString][i] << ' ';
-//    }
-
-    //std::cout << registers["fa0"].dval;
-
-//    for (int i = 0; i < 3 * 4; i += 4)
-//        std::cout << arrayFloat[registers["a0"].whichString][i] << ' ';
     return 0;
 }
