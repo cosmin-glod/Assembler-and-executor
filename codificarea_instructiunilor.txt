@@ -21,6 +21,9 @@ j - jump                        - 40 - 64
 call                            - 41 - 65
 ret                             - 42 - 66
 
+inceput de sir de caractere     - ff - -1
+din sectiunea .rodata
+
 beqz - branch if = 0            - 50 - 80
 bnez - brach if != 0            - 51 - 81
 bge - branch if o1 >= o2        - 52 - 82
