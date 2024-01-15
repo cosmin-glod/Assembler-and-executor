@@ -70,7 +70,7 @@ a1 LL* 5 [elementul ce este adaugat in lista]
 arrayFloat pentru float a[], float matrice[][]
 - se ruleaza comanda "./executor" in terminalul cu sursa
 - dupa executare in fisierul "nume_fisier.out" se va afla starea finala a registrilor
-- se deschide fisierul folosit comanda "cat nume_fisier.out" si se afiseaza pe ecran starea registrilor (pentru registrii in care o adresa, vom afisa continutul din memorie)
+- se deschide fisierul folosit comanda "cat nume_fisier.out" si se afiseaza pe ecran starea registrilor folositi in program, cu exceptia registrilor sb, ra si zero (pentru registrii in care o adresa, vom afisa continutul din memorie)
 To do
 
 
