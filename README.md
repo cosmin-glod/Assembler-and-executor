@@ -5,19 +5,19 @@
 
 
 
-## Echipa Albăstrelele, seria 15, grupa 151
+## Echipa Ultima săptămână, seria 15, grupa 151
 
-- [@Andu9](https://github.com/Andu9) Nita Alexandru
+- [@Andu9](https://github.com/Andu9) Niță Alexandru
 - [@cosmin371](https://github.com/cosmin371) Glod Cosmin-Stefan
 - [@danielbirsan](https://github.com/danielbirsan) Birsan Gheorghe Daniel
 
 ## Despre
--Asamblorul codifica instructiunile si le scrie intr-un fisier binar, urmand sa fie executate de catre executor. In acest repo se gasesc codificarile facute pentru instructiuni, registri si functiile din C++.
+-Asamblorul codifică instrucțiunile și le scrie într-un fisier binar, urmand sa fie executate de catre executor. In acest repo se gasesc codificarile facute pentru instructiuni, registri si functiile din C++.
 
 
 ##  Instalare si requirements
 
-- Compilator C++: (GCC, Clang sau Microsoft Visual C++).
+- Compilator C++: (g++ 11.4).
 - Editor de text sau IDE: (Code::Blocks, Visual Studio Code).
 - Sistem de operare: linux/windows
 
@@ -32,27 +32,51 @@ https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
 
 
 ## Rularea codului
-- -----LINUX-----
-- Asamblor:
-- se descarca codul sursa
-- se ruleaza comanda "g++ asamblor.cpp -o asamblor" in terminal in folderul cu sursa
-- in fisierul "input.in" se pune programul in assembly risc-v ce urmeaza a fi asamblat
-- se ruleaza comanda "./asamblor"
-- in fisierul "executabil.bin" se afla binarul din urma executarii
-- Executor: 
-- se descarca codul sursa
-- se ruleaza comanda "g++ executor.cpp -o executor" in terminal in folderul cu sursa
-- in fisierul "nume_fisier.in" trebuie sa se afle starea initiala a registrilor sub forma
--             nume_registru tipul_de_date valoare
--             string pentru const char *, char *
-int pentru unsigned long, int 
-arrayInt pentru int arr[], const int arr[]
-arrayLong pentru vectori de long
-Coordinate& pentru struct Coordinate
-float pentru float
-float& pentru float&
-LL* pentru LL* 
 
+<h3>Linux</h3>
+
+<h4>Asamblor:</h4> 
+
+- se descarcă codul sursă
+- se rulează următoarea comandă în terminal în folderul cu sursa
+ ```bash
+ g++ asamblor.cpp -o asamblor
+ 
+ ```
+- în fișierul <b>"input.in"</b> se pune programul in assembly risc-v ce urmează a fi asamblat
+- se rulează comanda
+ ```bash
+./asamblor
+ 
+ ```
+- in fisierul "executabil.bin" se afla binarul din urma executarii
+
+
+<h4>Executor: </h4>
+
+- se descarcă codul sursă
+- se ruleaza comanda în terminal în folderul cu sursa
+
+ ```bash
+g++ executor.cpp -o executor
+ 
+ ```
+
+- in fisierul <b>"nume_fisier.in"</b> trebuie să se afle starea inițială a regiștrilor sub forma
+  <p><b> nume_registru tipul_de_date valoare </b>  separate prin câte un spațiu </p>
+- <b>string</b> pentru <b>const char *</b>sau <b>char *</b>
+- <b>int</b> pentru <b>unsigned long, int </b>
+- <b>arrayInt </b> pentru <b> int arr[], const int arr[] </b>
+- <b>arrayLong </b> pentru <b>vectori de long</b>
+- <b> Coordinate& </b> pentru <b>struct Coordinate </b>
+- <b>float </b> pentru <b> float </b>
+- <b>float& </b> pentru <b> float& </b>
+- <b> LL* </b> pentru <b> LL* </b>
+- <b>arrayFloat </b> pentru <b> float a[], float matrice[][] </b>
+
+<h3>Exemplu</h3>
+
+ ```bash
 a0 string abcd
 a1 int 78
 fa0 float -5.6
@@ -65,13 +89,23 @@ a1 arrayDouble 6.4
 a0 Coordinate& 3.5 -4.7
 a2 LL* 1 2 3 [lista unde pozitia de start este prima valoare]
 a1 LL* 5 [elementul ce este adaugat in lista]
+ 
+ ```
 
 
-arrayFloat pentru float a[], float matrice[][]
-- se ruleaza comanda "./executor" in terminalul cu sursa
-- dupa executare in fisierul "nume_fisier.out" se va afla starea finala a registrilor
-- se deschide fisierul folosit comanda "cat nume_fisier.out" si se afiseaza pe ecran starea registrilor folositi in program, cu exceptia registrilor sb, ra si zero (pentru registrii in care o adresa, vom afisa continutul din memorie)
-To do
+- se ruleaza comanda următoare în terminalul cu sursa
+ ```bash
+./executor
+ 
+ ```
+- dupa executare in fisierul <b>"nume_fisier.out"</b> se va afla starea finală a regiștrilor
+
+-se deschide fisierul folosit comanda si 
+ ```bash
+cat nume_fisier.out
+ 
+ ```
+-se afiseaza pe ecran starea registrilor folositi in program, cu exceptia registrilor sb, ra si zero (pentru registrii in care o adresa, vom afisa continutul din memorie)
 
 
 ## Cerința Proiectului
@@ -79,25 +113,17 @@ To do
 - https://cs.unibuc.ro/~crusu/asc/Arhitectura%20Sistemelor%20de%20Calcul%20(ASC)%20-%20Proiect%200x00%202023.pdf
 
 ## Bibliografie - Linkuri utile
+- [Detalii despre proiect](https://cs.unibuc.ro/~crusu/asc/Arhitectura%20Sistemelor%20de%20Calcul%20(ASC)%20-%20Proiect%200x00%202023.pdf)
+- [Cele 12 programe model](https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/)
+- [Documentatia de assembly risc-v](https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf)
+- [Detalii despre registrii risc-v](https://en.wikichip.org/wiki/risc-v/registers)
+- [Cum scriem/citim un fisier binar?](https://medium.com/@zekumoru/how-to-work-with-binary-files-in-c-520a852ee04a)
 
-Detalii despre proiect
-https://cs.unibuc.ro/~crusu/asc/Arhitectura%20Sistemelor%20de%20Calcul%20(ASC)%20-%20Proiect%200x00%202023.pdf
 
-Cele 12 programe model
-https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
-
-Documentatia de assembly risc-v
-https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf
-
-Detalii despre registrii risc-v
-https://en.wikichip.org/wiki/risc-v/registers
-
-Cum scriem/citim un fisier binar ?
+## Cum scriem/citim un fisier binar ?
 https://medium.com/@zekumoru/how-to-work-with-binary-files-in-c-520a852ee04a#:~:text=Binary%20Operations,binary%20%7C%20ios%3A%3A%20trunc)%3B
 
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
-
 
