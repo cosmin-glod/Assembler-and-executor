@@ -34,10 +34,9 @@ https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
 ## Rularea codului
 
 <h3>Linux</h3>
-
+- se descarca fisierele din acest repository
 <h4>Asamblor:</h4> 
 
-- se descarcă codul sursă
 - se rulează următoarea comandă în terminal în folderul cu sursa
  ```bash
  g++ asamblor.cpp -o asamblor
@@ -54,7 +53,6 @@ https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
 
 <h4>Executor: </h4>
 
-- se descarcă codul sursă
 - se rulează comanda în terminal în folderul cu sursa
 
  ```bash
