@@ -44,7 +44,15 @@ https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
 - se ruleaza comanda "g++ executor.cpp -o executor" in terminal in folderul cu sursa
 - in fisierul "nume_fisier.in" trebuie sa se afle starea initiala a registrilor sub forma
 -             nume_registru tipul_de_date valoare
--             tipul de date trebuie sa fie una din urmatoarele: string, int, arrayInt, arrayFloat, arrayLong
+-             string pentru const char *, char *
+int pentru unsigned long, int 
+arrayInt pentru int arr[], const int arr[]
+arrayLong pentru vectori de long
+Coordinate& pentru struct Coordinate
+float pentru float
+float& pentru float&
+LL* pentru LL* 
+arrayFloat pentru float a[], float matrice[][]
 - se ruleaza comanda "./executor" in terminalul cu sursa
 - dupa executare in fisierul "nume_fisier.out" se va afla starea finala a registrilor
 To do
