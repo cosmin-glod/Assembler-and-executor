@@ -102,7 +102,7 @@ a1 LL* 5 [elementul ce este adăugat in lista]
  ```
 - dupa executare în fișierul <b>"nume_fisier.out"</b> se va află starea finală a regiștrilor
 
--se deschide fișierul folosit comanda:
+-se deschide fișierul folosind comanda:
  ```bash
 cat nume_fisier.out
  
