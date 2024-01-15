@@ -49,20 +49,20 @@ https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
 ./asamblor
  
  ```
-- in fisierul "executabil.bin" se afla binarul din urma executarii
+- in fisierul <b> "executabil.bin"</b> se află binarul din urma executării
 
 
 <h4>Executor: </h4>
 
 - se descarcă codul sursă
-- se ruleaza comanda în terminal în folderul cu sursa
+- se rulează comanda în terminal în folderul cu sursa
 
  ```bash
 g++ executor.cpp -o executor
  
  ```
 
-- in fisierul <b>"nume_fisier.in"</b> trebuie să se afle starea inițială a regiștrilor sub forma
+- în fișierul <b>"nume_fisier.in"</b> trebuie să se afle starea inițială a regiștrilor sub forma
   <p><b> nume_registru tipul_de_date valoare </b>  separate prin câte un spațiu </p>
 - <b>string</b> pentru <b>const char *</b>sau <b>char *</b>
 - <b>int</b> pentru <b>unsigned long, int </b>
@@ -87,25 +87,25 @@ a2 arrayFloat 1.2 5.2 -80.4
 a2 arrayFloat& 3.4
 a1 arrayDouble 6.4
 a0 Coordinate& 3.5 -4.7
-a2 LL* 1 2 3 [lista unde pozitia de start este prima valoare]
-a1 LL* 5 [elementul ce este adaugat in lista]
+a2 LL* 1 2 3 [lista unde pozișia de start este prima valoare]
+a1 LL* 5 [elementul ce este adăugat in lista]
  
  ```
 
 
-- se ruleaza comanda următoare în terminalul cu sursa
+- se rulează comanda următoare în terminalul cu sursa
  ```bash
 ./executor
  
  ```
-- dupa executare in fisierul <b>"nume_fisier.out"</b> se va afla starea finală a regiștrilor
+- dupa executare în fișierul <b>"nume_fisier.out"</b> se va află starea finală a regiștrilor
 
--se deschide fisierul folosit comanda si 
+-se deschide fișierul folosit comanda:
  ```bash
 cat nume_fisier.out
  
  ```
--se afiseaza pe ecran starea registrilor folositi in program, cu exceptia registrilor sb, ra si zero (pentru registrii in care o adresa, vom afisa continutul din memorie)
+-se afișează pe ecran starea registrilor folosiți în program, cu exceptia regiștrilor sb, ra si zero (pentru registrii în care o adresa, vom afișa conținutul din memorie)
 
 
 ## Cerința Proiectului
