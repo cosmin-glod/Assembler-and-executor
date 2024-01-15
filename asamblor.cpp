@@ -17,6 +17,7 @@ std::map<std::string, int> posEtichete;
 std::map<std::string, int> CFunctions;
 std::map<std::string, int> instructions;
 std::map<std::string, int> Registers;
+std::map<std::string, std::pair<std::string, char>> variables;
 
 bool isNumeric (const char a) {
     return (a >= '0' && a <= '9');
@@ -102,12 +103,79 @@ int main () {
     std::string line;
 
     std:getline (in, line);
-    std::getline (in, line);
-    std::getline (in, line);
+
+    if (line == ".section .rodata")
+    {
+        std::getline(in, line);
+        int nr_variables = 0;
+        while (line != ".section .text")
+        {
+            if (line == "")
+            {
+                std::getline(in, line);
+                continue;
+            }
+
+            //std::cout << line << '\n';
+            int i = 0;
+            while (line[i] == ' ') ++i;
+
+            if (line[i] == '#')
+                continue;
+
+            std::string currentVariable = "";
+            while (line[i] != ':')
+                currentVariable += line[i], i++;
+
+            i++; // trec peste :
+            while (line[i] == ' ') ++i;
+            while (line[i] != ' ') ++i; // trec peste .asciz
+            while (line[i] == ' ') ++i;
+            ++i;
+            std::string valoare = "";
+            while (line[i] != '"')
+                valoare += line[i], i++;
+
+            //std::cout << currentVariable << ' ' << valoare << ' ' << nr_variables << '\n';
+            variables[currentVariable] = {valoare, nr_variables++};
+            //std::cout << variables[currentVariable].first << ' ' << variables[currentVariable].second << '\n';
+
+            char codificare = -1;
+            executabil.write(reinterpret_cast<const char*>(&codificare), 1);
+
+            for (i = 0; valoare[i] != '\0'; ++i)
+                if (valoare[i] != '\\')
+                    executabil.write(reinterpret_cast<const char*>(&(valoare[i])), 1);
+                else
+                {
+                    char v;
+                    i++;
+                    if (valoare[i] == 'n')
+                        v = '\n';
+                    else if (valoare[i] == 't')
+                        v = '\t';
+                    else if (valoare[i] == '\\')
+                        v = '\\';
+                    else if (valoare[i] == '\"')
+                        v = '\"';
+                    else if (valoare[i] == '\'')
+                        v = '\'';
+                    executabil.write(reinterpret_cast<const char*>(&v), 1);
+                }
+
+
+            executabil.write(reinterpret_cast<const char*>(&valoare[i]), 1);
+
+            std::getline(in, line);
+        }
+    }
+    while (line != "main:")
+        std::getline(in,line);
+
 
     while (!in.eof ()) {
         std::getline (in, line);
-
+        std::cout << line << '\n';
         int i  = 0;
         while (line[i] != NULL && line[i] == ' ') i += 1;
 
@@ -274,7 +342,7 @@ int main () {
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
             executabil.write (reinterpret_cast<const char *> (&nr), 4);
         } else if (currentInstruction == "mv" || currentInstruction == "fsqrt.d" || currentInstruction == "fmv.s"
-                   || currentInstruction == "fmv.s.x") {
+                   || currentInstruction == "fmv.s.x" || currentInstruction == "la") {
             while (line[i] == ' ') i += 1;
 
             std::string currentRegister1 = "";
@@ -286,12 +354,15 @@ int main () {
 
             std::string currentRegister2 = "";
 
-            while (isLetter (line[i]) || isNumeric (line[i]))
+            while (isLetter (line[i]) || isNumeric (line[i]) || line[i] == '_')
                 currentRegister2 += line[i], i += 1;
 
             executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
             executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
-            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+            if (variables.find(currentRegister2) == variables.end())
+                executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+            else
+                executabil.write (reinterpret_cast<const char *> (&variables[currentRegister2].second), 1);
         } else if (currentInstruction == "ret") {
             executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
         } else if (currentInstruction == "beqz" || currentInstruction == "bnez") {
