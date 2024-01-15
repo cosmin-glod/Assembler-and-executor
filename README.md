@@ -39,7 +39,7 @@ https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
 - in fisierul "input.in" se pune programul in assembly risc-v ce urmeaza a fi asamblat
 - se ruleaza comanda "./asamblor"
 - in fisierul "executabil.bin" se afla binarul din urma executarii
-- Executor:
+- Executor: 
 - se descarca codul sursa
 - se ruleaza comanda "g++ executor.cpp -o executor" in terminal in folderul cu sursa
 - in fisierul "nume_fisier.in" trebuie sa se afle starea initiala a registrilor sub forma
@@ -70,6 +70,7 @@ a1 LL* 5 [elementul ce este adaugat in lista]
 arrayFloat pentru float a[], float matrice[][]
 - se ruleaza comanda "./executor" in terminalul cu sursa
 - dupa executare in fisierul "nume_fisier.out" se va afla starea finala a registrilor
+- se deschide fisierul folosit comanda "cat nume_fisier.out" si se afiseaza pe ecran starea registrilor (pentru registrii in care o adresa, vom afisa continutul din memorie)
 To do
 
 
@@ -97,4 +98,6 @@ https://medium.com/@zekumoru/how-to-work-with-binary-files-in-c-520a852ee04a#:~:
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+
 
