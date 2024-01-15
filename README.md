@@ -83,7 +83,12 @@ fa0 float -5.6
 a1 float& 2.3 1.2
 a0 arrayInt 5 3 -4 1
 a1 arrayLong 10 4 -5 -3 0
-a2 arrayFloat 1.2 5.2 -80.4
+a2 arrayFloat 1.2 5.2 -80.4 [Atentie! Pentru matricea de la programul 12 (Vector x Matrix) se va folosi arrayFloat si urmeaza cele 9 numere din matrice completata pe coloana, nu pe linii!]
+Ex:
+1 2 3 4 5 6 7 8 9 este
+1 4 7
+2 5 8
+3 6 9
 a2 arrayFloat& 3.4
 a1 arrayDouble 6.4
 a0 Coordinate& 3.5 -4.7
