@@ -169,9 +169,10 @@ int main () {
             std::getline(in, line);
         }
     }
-    while (line != "main:")
+    while (line != ".section .text")
         std::getline(in,line);
-
+    std::getline(in,line);
+    std::getline(in,line);
 
     while (!in.eof ()) {
         std::getline (in, line);
