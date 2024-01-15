@@ -62,6 +62,22 @@ To do
  Crearea unui standard de cod mașină și apoi un executor pentru fișierele binare generate
 - https://cs.unibuc.ro/~crusu/asc/Arhitectura%20Sistemelor%20de%20Calcul%20(ASC)%20-%20Proiect%200x00%202023.pdf
 
+## Bibliografie - Linkuri utile
+
+Detalii despre proiect
+https://cs.unibuc.ro/~crusu/asc/Arhitectura%20Sistemelor%20de%20Calcul%20(ASC)%20-%20Proiect%200x00%202023.pdf
+
+Cele 12 programe model
+https://marz.utk.edu/my-courses/cosc230/book/example-risc-v-assembly-programs/
+
+Documentatia de assembly risc-v
+https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf
+
+Detalii despre registrii risc-v
+https://en.wikichip.org/wiki/risc-v/registers
+
+Cum scriem/citim un fisier binar ?
+https://medium.com/@zekumoru/how-to-work-with-binary-files-in-c-520a852ee04a#:~:text=Binary%20Operations,binary%20%7C%20ios%3A%3A%20trunc)%3B
 
 ## License
 
