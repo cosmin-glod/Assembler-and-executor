@@ -9,7 +9,7 @@
 
 - [@Andu9](https://github.com/Andu9) Niță Alexandru
 - [@cosmin371](https://github.com/cosmin371) Glod Cosmin-Stefan
-- [@danielbirsan](https://github.com/danielbirsan) Birsan Gheorghe Daniel
+- [@danielbirsan](https://github.com/danielbirsan) Bîrsan Gheorghe Daniel
 
 ## Despre
 -Asamblorul codifică instrucțiunile și le scrie într-un fisier binar, urmand sa fie executate de catre executor. In acest repo se gasesc codificarile facute pentru instructiuni, registri si functiile din C++.
@@ -22,7 +22,12 @@
 - Sistem de operare: linux/windows
 
 +Binary viewer (ex: https://binary-viewer.en.softonic.com/download)
-+Pentru Linux puteti folosi bvi: "sudo apt-get -y install bvi"
+
++Pentru Linux puteti folosi bvi: 
+ ```bash
+sudo apt-get -y install bvi
+ 
+ ```
 
 
 ## Testare
