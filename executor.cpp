@@ -10,8 +10,8 @@
 
 const int nMax = 1e6 + 1;
 
-std::ifstream fin("nume_fisier.in");
-std::ofstream fout("nume_fisier.out");
+std::ifstream fin("stare_initiala.in");
+std::ofstream fout("stare_finala.out");
 
 std::fstream executabil("executabil.bin", std::ios::in | std::ios::binary);
 
