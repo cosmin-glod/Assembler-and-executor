@@ -1,696 +1,434 @@
 #include <ios>
+#include <istream>
+#include <utility>
 #include <iostream>
 #include <fstream>
-#include <cstring>
-#include <sstream>
-#include <vector>
 #include <string>
-#include <cmath>
+#include <list>
 #include <map>
 
-const int nMax = 1e6 + 1;
+std::ifstream in("input.in");
+std::fstream executabil("executabil.bin", std::ios::out | std::ios::binary | std::ios::trunc);
 
-std::ifstream fin("nume_fisier.in");
-std::fstream executabil("executabil.bin", std::ios::in | std::ios::binary);
+std::list<std::pair<std::string, int>> waitingLabels;
 
-bool isNumeric (char a) {
+std::map<std::string, int> posEtichete;
+
+std::map<std::string, int> CFunctions;
+std::map<std::string, int> instructions;
+std::map<std::string, int> Registers;
+
+bool isNumeric (const char a) {
     return (a >= '0' && a <= '9');
 }
 
-struct componenetsRegisters {
-    long long val;
-    bool isInt = false;
-
-    char car;
-    bool isChar = false;
-
-    int index;
-    int whichString;
-    bool isPointer = false;
-
-    float fval;
-    bool isFloat;
-};
-
-std::map<int, std::string> codeRegisters;
-std::map<std::string, componenetsRegisters> registers;
-
-std::vector<componenetsRegisters> Stack;
-
-std::vector<std::string> strings;
-std::vector<std::vector<int>> arrayInt;
-std::vector<std::vector<long long>> arrayLong;
-std::vector<std::vector<float>> arrayFloat;
+bool isLetter (const char a) {
+    return (a >= 'a' && a <= 'z') || (a >= 'A' && a <= 'Z');
+}
 
 int main () {
-    while (!fin.eof ()) {
-        std::string currentRegister; fin >> currentRegister;
+    instructions["la"] = 0;
+    instructions["lb"] = 1;
+    instructions["lw"] = 2;
+    instructions["ld"] = 3;
+    instructions["li"] = 4;
+    instructions["add"] = 16;
+    instructions["addi"] = 17;
+    instructions["sub"] = 18;
+    instructions["sb"] = 32;
+    instructions["sd"] = 33;
+    instructions["mv"] = 34;
+    instructions["slli"] = 48;
+    instructions["srai"] = 49;
+    instructions["j"] = 64;
+    instructions["call"] = 65;
+    instructions["ret"] = 66;
+    instructions["beqz"] = 80;
+    instructions["bnez"] = 81;
+    instructions["bge"] = 82;
+    instructions["bgt"] = 83;
+    instructions["ble"] = 84;
 
-        std::string dataType; fin >> dataType;
+    instructions["flw"] = 96;
+    instructions["fld"] = 97;
+    instructions["fsw"] = 98;
 
-        std::string content; std::getline (fin, content);
-
-        while (content[0] == ' ')
-            content.erase (0, 1);
-
-        if (dataType == "string") {
-            content.resize (1000, '@');
-            strings.emplace_back (content);
-
-            registers[currentRegister].index = 0;
-            registers[currentRegister].whichString = strings.size () - 1;
-            registers[currentRegister].isPointer = true;
-        } else if (dataType == "int") {
-            registers[currentRegister].val = std::stoi (content);
-            registers[currentRegister].isInt = true;
-        } else if (dataType == "arrayInt") {
-            std::vector<int> help;
-            std::string::iterator it = content.begin ();
-            while (it != content.end ()) {
-                bool Minus = false;
-                if (*it == '-')
-                    Minus = true, ++it;
-
-                int elementActual = 0;
-                //std::cout << isNumeric (*it);
-                while (it != content.end () && isNumeric (*it))
-                    elementActual = elementActual * 10 + (int) (*it - '0'), ++it;
-
-                if (Minus == true) elementActual = -elementActual;
-
-                help.emplace_back (elementActual);
-                help.emplace_back (0), help.emplace_back (0), help.emplace_back (0);
-
-                if (it == content.end ())
-                    break;
-                ++it;
-            }
-
-            arrayInt.emplace_back (help);
-
-            registers[currentRegister].index = 0;
-            registers[currentRegister].whichString = arrayInt.size () - 1;
-            registers[currentRegister].isPointer = true;
-        } else if (dataType == "arrayLong") {
-            std::vector<long long> help;
-            std::string::iterator it = content.begin ();
-            while (it != content.end ()) {
-                bool Minus = false;
-                if (*it == '-')
-                    Minus = true, ++it;
-
-                int elementActual = 0;
-                while (it != content.end () && isNumeric (*it))
-                    elementActual = elementActual * 10 + (int) (*it - '0'), ++it;
-
-                if (Minus == true) elementActual = -elementActual;
-
-                help.emplace_back (elementActual);
-                help.emplace_back (0), help.emplace_back (0), help.emplace_back (0);
-                help.emplace_back (0), help.emplace_back (0), help.emplace_back (0);
-                help.emplace_back (0);
-
-                if (it == content.end ())
-                    break;
-                ++it;
-            }
-
-            arrayLong.emplace_back (help);
-
-            registers[currentRegister].index = 0;
-            registers[currentRegister].whichString = arrayLong.size () - 1;
-            registers[currentRegister].isPointer = true;
-        } else if (dataType == "float") {
-            float valoare = std::stof (content);
-
-            registers[currentRegister].isFloat = 1;
-            registers[currentRegister].fval = valoare;
-        } else if (dataType == "float&" || dataType == "arrayFloat") {
-            std::istringstream citireFloat(content);
-            std::vector<float> help;
-
-            float valoare;
-            while (citireFloat >> valoare)
-                help.emplace_back (valoare);
-
-            arrayFloat.emplace_back (help);
-        }
-    }
-
-    codeRegisters[0] = "zero";
-    codeRegisters[1] = "ra";
-    codeRegisters[2] = "sp";
-
-    codeRegisters[16] = "t0";
-    codeRegisters[17] = "t1";
-    codeRegisters[18] = "t2";
-    codeRegisters[19] = "t3";
-    codeRegisters[20] = "t4";
-    codeRegisters[21] = "t5";
-
-    codeRegisters[33] = "s1";
-
-    codeRegisters[48] = "a0";
-    codeRegisters[49] = "a1";
-    codeRegisters[50] = "a2";
-    codeRegisters[51] = "a3";
-
-    codeRegisters[64] = "ft0";
-    codeRegisters[65] = "ft1";
-    codeRegisters[66] = "ft2";
-    codeRegisters[67] = "ft3";
-
-    codeRegisters[80] = "fa0";
-    codeRegisters[81] = "fa1";
-    codeRegisters[82] = "fa2";
-
-/*
-    codeFunctions[112] = "strlen";
-    codeFunctions[96] = "printf";
-    codeFunctions[97] = "scanf";
-    codeFunctions[113] = "cfunc";
-*/
+    instructions["fadd.d"] = 112;
+    instructions["fsub.d"] = 113;
+    instructions["fmul.d"] = 114;
+    instructions["fsqrt.d"] = 115;
 
 
-    char code;
-
-    int test = 0;
-
-    executabil.read (&code, 1);
-    while (code != 66) {
-        test += 1;
-        //std::cout << (int) code << ' ';
-        if (code == 4) { /// li
-            char currentRegister;
-            executabil.read (&currentRegister, 1);
-
-            int constant;
-            executabil.read (reinterpret_cast<char *> (&constant), 4);
+    instructions["fadd.s"] = -128;
+    instructions["fmul.s"] = -127;
+    instructions["fmv.s"] = -126;
+    instructions["fmv.s.x"] = -125;
+    instructions["fgt.s"] = -124;
+    instructions["flt.s"] = -123;
 
 
-            registers[codeRegisters[currentRegister]].isInt = true;
-            registers[codeRegisters[currentRegister]].isChar = registers[codeRegisters[currentRegister]].isPointer = false;
+    Registers["zero"] = 0;
+    Registers["ra"] = 1;
+    Registers["sp"] = 2;
 
-            registers[codeRegisters[currentRegister]].val = constant;
-       } else if (code == 16) { /// add
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-            int i = currentRegister1;
+    Registers["t0"] = 16;
+    Registers["t1"] = 17;
+    Registers["t2"] = 18;
+    Registers["t3"] = 19;
+    Registers["t4"] = 20;
+    Registers["t5"] = 21;
 
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-            int j = currentRegister2;
+    Registers["s1"] = 33;
 
-            char currentRegister3;
-            executabil.read (&currentRegister3, 1);
-            int k = currentRegister3;
+    Registers["a0"] = 48;
+    Registers["a1"] = 49;
+    Registers["a2"] = 50;
+    Registers["a3"] = 51;
 
-            //std::cout << registers[codeRegisters[j]].val << ' ' << registers[codeRegisters[k]].val << '\n';
+    Registers["ft0"] = 64;
+    Registers["ft1"] = 65;
+    Registers["ft2"] = 66;
+    Registers["ft3"] = 67;
 
-            if (registers[codeRegisters[j]].isPointer == true) {
-                registers[codeRegisters[i]].isPointer = true;
-                registers[codeRegisters[i]].isChar = registers[codeRegisters[i]].isInt = false;
+    Registers["fa0"] = 80;
+    Registers["fa1"] = 81;
+    Registers["fa2"] = 82;
 
-                registers[codeRegisters[i]].index = registers[codeRegisters[k]].val;
-                registers[codeRegisters[i]].whichString = registers[codeRegisters[j]].whichString;
-            } else if (registers[codeRegisters[k]].isPointer == true) {
-                registers[codeRegisters[i]].isPointer = true;
-                registers[codeRegisters[i]].isChar = registers[codeRegisters[i]].isInt = false;
+    CFunctions["strlen"] = 112;
+    CFunctions["printf"] = 96;
+    CFunctions["scanf"] = 97;
+    CFunctions["cfunc"] = 113;
 
-                registers[codeRegisters[i]].index = registers[codeRegisters[j]].val;
-                registers[codeRegisters[i]].whichString = registers[codeRegisters[k]].whichString;
-            } else if (registers[codeRegisters[j]].isInt == true && registers[codeRegisters[k]].isInt == true) {
-                registers[codeRegisters[i]].isInt = true;
-                registers[codeRegisters[i]].isChar = registers[codeRegisters[i]].isPointer = false;
+    std::string line;
 
-                registers[codeRegisters[i]].val = registers[codeRegisters[j]].val + registers[codeRegisters[k]].val;
-            }
-        } else if (code == 1) { /// lb
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
+    std:getline (in, line);
+    std::getline (in, line);
+    std::getline (in, line);
 
-            int constant;
-            executabil.read (reinterpret_cast<char *> (&constant), 4);
+    while (!in.eof ()) {
+        std::getline (in, line);
 
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
+        int i  = 0;
+        while (line[i] != NULL && line[i] == ' ') i += 1;
 
-            //std::cout << "lb: " << codeRegisters[currentRegister1] << ' ' << constant << ' ' << codeRegisters[currentRegister2] << '\n';
-            //std::cout << '\n';
+        if (line[i] == '#')
+            continue;
 
-            if (registers[codeRegisters[currentRegister2]].isPointer == true) {
-                //std::cout << "E char: " << codeRegisters[currentRegister1] << '\n';
-                //std::cout << "lb: " << registers[codeRegisters[currentRegister2]].Pointer[] << '\n';
+        std::string currentInstruction = "";
 
-                registers[codeRegisters[currentRegister1]].isChar = true;
+        while (line[i] != NULL && line[i] != ' ')
+            currentInstruction += line[i], i += 1;
 
-                std::cout << registers[codeRegisters[currentRegister1]].isChar << '\n';
+        if (currentInstruction[currentInstruction.size () - 1] == ':') {
 
-                registers[codeRegisters[currentRegister1]].isPointer = registers[codeRegisters[currentRegister1]].isInt = false;
+            int currentSize = executabil.tellg ();
 
-                int index = registers[codeRegisters[currentRegister2]].index;
-                int whichString = registers[codeRegisters[currentRegister2]].whichString;
+            //std::cout << currentSize << '\n';
 
-                //std::cout << strings[whichString][constant + index] << '\n';
+            currentInstruction.pop_back ();
+            posEtichete[currentInstruction] = currentSize;
 
-                //if (strings[whichString][constant])
+            //std::cout << posEtichete["1"] << '\n';
 
-                if (strings[whichString][constant + index] == '@')
-                    registers[codeRegisters[currentRegister1]].car = 0, std::cout << registers[codeRegisters[currentRegister1]].isChar << ' ';
+            std::list<std::pair<std::string, int>>::iterator it = waitingLabels.begin ();
+
+            while (it != waitingLabels.end ()) {
+                if ((*it).first == currentInstruction) {
+                    executabil.seekg ((*it).second, std::ios_base::beg);
+                    executabil.write (reinterpret_cast<const char *> (&posEtichete[currentInstruction]), 2);
+                    executabil.seekg (0, std::ios_base::end);
+
+                    it = waitingLabels.erase (it);
+                }
+
                 else
-                    registers[codeRegisters[currentRegister1]].car = strings[whichString][constant + index];
-
-//
-//                if (constant + index < strings[whichString].size ())
-//                    registers[codeRegisters[currentRegister1]].car = strings[whichString][constant + index];
-//                else
-//                    registers[codeRegisters[currentRegister1]].car = 0;
-                //std::cout << registers[codeRegisters[currentRegister1]].car << '\n' << '\n';
-           }
-        } else if (code == 80) { /// beqz
-            char currentRegister;
-            executabil.read (&currentRegister, 1);
-
-            short constant;
-            executabil.read (reinterpret_cast<char *> (&constant), 2);
-
-            //std::cout << "beqz: " << codeRegisters[currentRegister] << ' ' << registers[codeRegisters[currentRegister]].car << ' ' << (registers[codeRegisters[currentRegister]].car == 0) << '\n';
-           // std::cout << '\n';
-
-           //std::cout << "Este char: " << registers[codeRegisters[currentRegister]].isChar << '\n';
-
-            if (registers[codeRegisters[currentRegister]].car == 0) {
-                executabil.seekp (constant, std::ios_base::beg);
-            }
-            if (registers[codeRegisters[currentRegister]].isInt == true && registers[codeRegisters[currentRegister]].val == 0) {
-                executabil.seekp (constant, std::ios_base::beg);
-            }
-        } else if (code == 17) { /// addi
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            int constant;
-            executabil.read (reinterpret_cast<char *> (&constant), 4);
-
-            if (currentRegister1 == 2) { /// sp
-                //std::cout << codeRegisters[currentRegister1] << ' ' << codeRegisters[currentRegister2] << ' ' << constant << '\n';
-                if (constant < 0) {
-                    constant = std::abs (constant) / 8; //std::cout << constant << '\n';
-                    Stack.resize (constant);
-                } else {
-                    constant /= 8;
-                    while (constant > 0)
-                        Stack.pop_back (), constant -= 1;
-                }
-            } else {
-                if (registers[codeRegisters[currentRegister2]].isInt == true) {
-                    registers[codeRegisters[currentRegister1]].isInt = true;
-                    registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
-
-                    registers[codeRegisters[currentRegister1]].val = registers[codeRegisters[currentRegister2]].val + constant;
-                } else if (registers[codeRegisters[currentRegister2]].isPointer == true) {
-                    registers[codeRegisters[currentRegister1]].isPointer = true;
-                    registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
-
-                    registers[codeRegisters[currentRegister1]].index = registers[codeRegisters[currentRegister2]].index + constant;
-
-                    //std::cout << "addi: " << registers[codeRegisters[currentRegister1]].index << '\n';
-                    //std::cout << '\n';
-                    //std::string help = registers[codeRegisters[currentRegister2]].Pointer;
-                    //registers[codeRegisters[currentRegister1]].Pointer = help.erase (0, constant);
-                }
-            }
-        } else if (code == 64) { /// j
-            short constant;
-            executabil.read (reinterpret_cast<char *> (&constant), 2);
-
-            executabil.seekp (constant, std::ios_base::beg);
-        } else if (code == 34) { /// mv
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            std::cout << registers[codeRegisters[currentRegister1]].val << ' ' << registers[codeRegisters[currentRegister2]].val << '\n';
-
-            if (registers[codeRegisters[currentRegister2]].isPointer == true) {
-                registers[codeRegisters[currentRegister1]].isPointer = true;
-                registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isInt = false;
-
-                registers[codeRegisters[currentRegister1]].index = registers[codeRegisters[currentRegister2]].index;
-                registers[codeRegisters[currentRegister1]].whichString = registers[codeRegisters[currentRegister2]].whichString;
-            } else if (registers[codeRegisters[currentRegister2]].isInt == true) {
-                registers[codeRegisters[currentRegister1]].isInt = true;
-                registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
-
-                registers[codeRegisters[currentRegister1]].val = registers[codeRegisters[currentRegister2]].val;
-            }
-        }else if (code == 32) { /// sb
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-            int i = currentRegister1;
-
-            int constanta;
-            executabil.read (reinterpret_cast<char *> (&constanta), 4);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-            int j = currentRegister2;
-
-            //std::cout << "sb: " << codeRegisters[i] << ' ' << constanta << ' ' << codeRegisters[j] << '\n';
-
-            //std::cout << "Caracter: " << registers[codeRegisters[i]].car << '\n';
-
-            //std::cout << '\n';
-
-            if (registers[codeRegisters[i]].isChar == true) {
-                registers[codeRegisters[j]].isPointer = true;
-                registers[codeRegisters[j]].isInt = registers[codeRegisters[i]].isChar = false;
-
-                //std::cout << "sb: " << registers[codeRegisters[i]].car << '\n';
-
-                int index = registers[codeRegisters[j]].index;
-                int whichString = registers[codeRegisters[j]].whichString;
-                char mutare = registers[codeRegisters[i]].car;
-
-               // std::cout << whichString << ' ' << constanta + index << ' ' << (int) mutare << '\n';
-
-                if (mutare != 0) {
-                    strings[whichString][constanta + index] = mutare;
-                    //std::cout << strings[whichString] << '\n';
-//                    for (int h = 0; h < strings[whichString].size (); h += 1)
-//                        std::cout << strings[whichString][h] << '\n';
-//                    std::cout << strings[whichString][constanta + index] << '\n';
-                } else {
-                    std::cout << (int) mutare << '\n';
-
-                   // std::cout << (int) mutare << '\n';
-                   // std::cout << constanta + index << '\n';
-
-                    int sfarsit = strings[whichString].size ();
-                    strings[whichString].erase (constanta + index, sfarsit);
-                }
-            }
-            //std::cout << '\n';
-        } else if (code == 82) { /// bge
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-            int i = currentRegister1;
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-            int j = currentRegister2;
-
-            short constanta;
-            executabil.read (reinterpret_cast<char *> (&constanta), 2);
-
-            //std::cout << "bge: " << registers[codeRegisters[currentRegister1]].val << ' ' << registers[codeRegisters[currentRegister2]].val << '\n';
-
-            if (registers[codeRegisters[currentRegister1]].val >= registers[codeRegisters[currentRegister2]].val)
-                executabil.seekp (constanta, std::ios_base::beg);
-        } else if (code == 33) { /// sd
-            //std::cout << "got here\n";
-
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            int constanta;
-            executabil.read (reinterpret_cast<char *> (&constanta), 4);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            if (codeRegisters[currentRegister2] == "sp") {
-                constanta /= 8;
-                componenetsRegisters help = registers[codeRegisters[currentRegister1]];
-                Stack[constanta] = help;
-            } else if (registers[codeRegisters[currentRegister1]].isInt == true) {
-                registers[codeRegisters[currentRegister2]].isPointer = true;
-                registers[codeRegisters[currentRegister2]].isChar = registers[codeRegisters[currentRegister2]].isInt = false;
-
-                int index = registers[codeRegisters[currentRegister2]].index;
-                int whichString = registers[codeRegisters[currentRegister2]].whichString;
-                int valoare = registers[codeRegisters[currentRegister1]].val;
-
-                arrayLong[whichString][constanta + index] = valoare;
-            }
-            //std::cout << codeRegisters[currentRegister1] << ' ' << constanta << ' ' << codeRegisters[currentRegister2] << '\n';
-        } else if (code == 65) { /// call
-            char Function;
-            executabil.read (&Function, 1);
-
-            if (Function == 112) { /// strlen
-                registers["a0"].isInt = true;
-                registers["a0"].isChar = registers["a0"].isPointer = false;
-
-                int index = 0;
-                while (strings[registers["a0"].index][index] != '@')
-                    index += 1;
-                strings[registers["a0"].index].erase (index, strings[registers["a0"].index].size ());
-                //std::cout <<
-                //std::cout << "Sir: " << strings[registers["a0"].index] << '\n';
-                registers["a0"].val = strings[registers["a0"].whichString].size ();
-            }
-        } else if (code == 49) { /// srai
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            int constanta;
-            executabil.read (reinterpret_cast<char *> (&constanta), 4);
-
-            registers[codeRegisters[currentRegister1]].isInt = true;
-            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
-
-            registers[codeRegisters[currentRegister1]].val = (registers[codeRegisters[currentRegister2]].val >> constanta);
-            //std::cout << registers[codeRegisters[currentRegister1]].val << '\n';
-        } else if (code == 18) { /// sub
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-            int i = currentRegister1;
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-            int j = currentRegister2;
-
-            char currentRegister3;
-            executabil.read (&currentRegister3, 1);
-            int k = currentRegister3;
-
-            if (registers[codeRegisters[j]].isInt == true) {
-                registers[codeRegisters[i]].isInt = true;
-                registers[codeRegisters[i]].isChar = registers[codeRegisters[i]].isPointer = false;
-
-                registers[codeRegisters[i]].val = registers[codeRegisters[j]].val - registers[codeRegisters[k]].val;
-            }
-        } else if (code == 3) { /// ld
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            int constanta;
-            executabil.read (reinterpret_cast<char *> (&constanta), 4);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            if (codeRegisters[currentRegister2] == "sp") {
-                constanta /= 8;
-                componenetsRegisters help = Stack[constanta];
-                registers[codeRegisters[currentRegister1]] = help;
-            } else if (registers[codeRegisters[currentRegister2]].isPointer == true) {
-                registers[codeRegisters[currentRegister1]].isInt = true;
-                registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
-
-                int index = registers[codeRegisters[currentRegister2]].index;
-                int whichString = registers[codeRegisters[currentRegister2]].whichString;
-
-                int indexArray = index + constanta;
-                registers[codeRegisters[currentRegister1]].val = arrayLong[whichString][indexArray];
-
-                //std::cout << "ld: " << registers[codeRegisters[currentRegister1]].val << '\n';
-            }
-        } else if (code == 48)  { /// slli
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            int constant;
-            executabil.read (reinterpret_cast<char *> (&constant), 4);
-
-            registers[codeRegisters[currentRegister1]].isInt = true;
-            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
-
-
-            registers[codeRegisters[currentRegister1]].val = (registers[codeRegisters[currentRegister2]].val << constant);
-            //std::cout << registers[codeRegisters[currentRegister1]].val << '\n';
-        } else if (code == 2) { /// lw
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            int constant;
-            executabil.read (reinterpret_cast<char *> (&constant), 4);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            if (registers[codeRegisters[currentRegister2]].isPointer == true) {
-                registers[codeRegisters[currentRegister1]].isInt = true;
-                registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isPointer = false;
-
-                int index = registers[codeRegisters[currentRegister2]].index;
-                int whichString = registers[codeRegisters[currentRegister2]].whichString;
-
-                int indexArray = index + constant;
-                registers[codeRegisters[currentRegister1]].val = arrayInt[whichString][indexArray];
-
-                //std::cout << codeRegisters[currentRegister1] << ' ' << registers[codeRegisters[currentRegister1]].val << '\n';
-            }
-        } else if (code == 84) { /// ble
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            short constanta;
-            executabil.read (reinterpret_cast<char *> (&constanta), 2);
-
-            //std::cout << "ble: " << registers[codeRegisters[currentRegister1]].val << ' ' << registers[codeRegisters[currentRegister2]].val << '\n';
-            //std::cout << (registers[codeRegisters[currentRegister1]].val <= registers[codeRegisters[currentRegister2]].val) << '\n';
-
-            if (registers[codeRegisters[currentRegister1]].val <= registers[codeRegisters[currentRegister2]].val)
-                executabil.seekp (constanta, std::ios_base::beg);
-        } else if (code == 81) { /// bnez
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            short constanta;
-            executabil.read (reinterpret_cast<char *> (&constanta), 2);
-
-            if (registers[codeRegisters[currentRegister1]].val != 0)
-                executabil.seekg (constanta, std::ios_base::beg);
-        } else if (code == 83) { /// bgt
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            short constanta;
-            executabil.read (reinterpret_cast<char *> (&constanta), 2);
-
-            if (registers[codeRegisters[currentRegister1]].val > registers[codeRegisters[currentRegister2]].val)
-                executabil.seekg (constanta, std::ios_base::beg);
-        } else if (code == -126) { /// fmv.s
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            registers[codeRegisters[currentRegister1]].isFloat = true;
-            registers[codeRegisters[currentRegister1]].fval = registers[codeRegisters[currentRegister2]].fval;
-
-            std::cout << "fmv.s: " << registers[codeRegisters[currentRegister1]].fval << '\n';
-        } else if (code == -124) { /// fgt.s
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            char currentRegister3;
-            executabil.read (&currentRegister3, 1);
-
-            float float1 = registers[codeRegisters[currentRegister2]].fval;
-            float float2 = registers[codeRegisters[currentRegister3]].fval;
-
-            registers[codeRegisters[currentRegister1]].isInt = true;
-            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
-
-            registers[codeRegisters[currentRegister1]].val = (float1 > float2);
-
-            std::cout << "fgt.s: " << registers[codeRegisters[currentRegister1]].val << '\n';
-        } else if (code == -123) { /// flt.s
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            char currentRegister3;
-            executabil.read (&currentRegister3, 1);
-
-            float float1 = registers[codeRegisters[currentRegister2]].fval;
-            float float2 = registers[codeRegisters[currentRegister3]].fval;
-
-            registers[codeRegisters[currentRegister1]].isInt = true;
-            registers[codeRegisters[currentRegister1]].isChar = registers[codeRegisters[currentRegister1]].isFloat = registers[codeRegisters[currentRegister1]].isPointer = false;
-
-            registers[codeRegisters[currentRegister1]].val = (float1 < float2);
-
-            std::cout << "flt.s: " << registers[codeRegisters[currentRegister1]].val << '\n';
-        } else if (code == 98) { /// fsw
-            char currentRegister1;
-            executabil.read (&currentRegister1, 1);
-
-            int constant;
-            executabil.read (reinterpret_cast<char *> (&constant), 4);
-
-            char currentRegister2;
-            executabil.read (&currentRegister2, 1);
-
-            //std::cout << "Got here!";
-
-            std::cout << "Got here: " << codeRegisters[currentRegister1] << ' ' << registers[codeRegisters[currentRegister1]].isFloat << '\n';
-
-            if (registers[codeRegisters[currentRegister1]].isFloat == true) {
-                registers[codeRegisters[currentRegister2]].isPointer = true;
-                registers[codeRegisters[currentRegister2]].isChar = registers[codeRegisters[currentRegister2]].isFloat = registers[codeRegisters[currentRegister2]].isInt = false;
-
-                int index = registers[codeRegisters[currentRegister2]].index;
-                int whichString = registers[codeRegisters[currentRegister2]].whichString;
-                float valoare = registers[codeRegisters[currentRegister1]].fval;
-
-                arrayFloat[whichString][index] = valoare;
+                    ++it;
             }
         }
 
-        //if (test == 34) {exit(0);}
 
-        executabil.read (&code, 1);
+        if (currentInstruction == "li") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            i -= 1;
+
+            bool Minus = 0;
+            if (line[i] == '-') Minus = 1;
+
+            i += 1;
+
+            int nr = 0;
+            while (isNumeric (line[i]))
+                nr = nr * 10 + (int) (line[i] - '0'), i += 1;
+
+            if (Minus == 1) nr = -nr;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister]), 1);
+            executabil.write (reinterpret_cast <const char *> (&nr), 4);
+        } else if (currentInstruction == "add" || currentInstruction == "sub" || currentInstruction == "fsub.d"
+                   || currentInstruction == "fmul.d" || currentInstruction == "fadd.d" || currentInstruction == "fmul.s"
+                   || currentInstruction == "fgt.s" || currentInstruction == "flt.s" || currentInstruction == "fadd.s") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            std::string currentRegister3 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister3 += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister3]), 1);
+        } else if (currentInstruction == "sb" || currentInstruction == "sd" || currentInstruction == "lb"
+                   || currentInstruction == "ld" || currentInstruction == "lw" || currentInstruction == "fld"
+                   || currentInstruction == "fsw" || currentInstruction == "flw") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            i -= 1;
+            bool Minus = 0;
+            if (line[i] == '-') Minus = 1;
+
+            i += 1;
+
+            int nr = 0;
+            while (isNumeric (line[i]))
+                nr = nr * 10 + (int) (line[i] - '0'), i += 1;
+
+            if (Minus == 1) nr = -nr;
+
+            i += 1;
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&nr), 4);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+        } else if (currentInstruction == "addi") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            i -= 1;
+
+            bool Minus = 0;
+            if (line[i] == '-') Minus = 1;
+            i += 1;
+
+            int nr = 0;
+
+            while (isNumeric (line[i]))
+                nr = nr * 10 + (int) (line[i] - '0'), i += 1;
+
+            if (Minus == 1) nr = -nr;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+            executabil.write (reinterpret_cast<const char *> (&nr), 4);
+        } else if (currentInstruction == "mv" || currentInstruction == "fsqrt.d" || currentInstruction == "fmv.s"
+                   || currentInstruction == "fmv.s.x") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+        } else if (currentInstruction == "ret") {
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+        } else if (currentInstruction == "beqz" || currentInstruction == "bnez") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister += line[i], i += 1;
+
+            while (line[i] == ' ' ) i += 1;
+
+            i += 1;
+
+            while (line[i] == ' ') i += 1;
+
+            std::string label = "";
+
+            while (line[i] != 'b' && line[i] != 'f')
+                label += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister]), 1);
+
+            if (line[i] == 'f') {
+                int currentSize = executabil.tellg ();
+
+                waitingLabels.push_back (std::make_pair (label, currentSize));
+
+                int zero = 0;
+                executabil.write (reinterpret_cast<const char *> (&zero), 2);
+
+            } else if (line[i] == 'b') {
+                executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
+            }
+        } else if (currentInstruction == "j") {
+
+            std::string label = "";
+
+            while (line[i] == ' ') i += 1;
+
+            while (line[i] != 'b' && line[i] != 'f')
+                label += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+
+            if (line[i] == 'f') {
+                int currentSize = executabil.tellg ();
+
+                waitingLabels.push_back (std::make_pair (label, currentSize));
+
+                int zero = 0;
+                executabil.write (reinterpret_cast<const char *> (&zero), 2);
+
+            } else if (line[i] == 'b')
+                executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
+
+        } else if (currentInstruction == "bge" || currentInstruction == "bgt" || currentInstruction == "ble") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            std::string label = "";
+
+            while (line[i] != 'b' && line[i] != 'f')
+                label += line[i], i += 1;
+
+            //while (line[i] != ' ' || line[i] != '\n')
+                //std::cout << line[i], i += 1;
+                //label += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+
+            //std::cout << label.size () << '\n';
+
+            if (line[i] == 'f') {
+                int currentSize = executabil.tellg ();
+
+                //std::cout << label.siz << '\n';
+
+                waitingLabels.push_back (std::make_pair (label, currentSize));
+
+                int zero = 0;
+                executabil.write (reinterpret_cast<const char *> (&zero), 2);
+            } else if (line[i] == 'b') {
+                executabil.write (reinterpret_cast<const char *> (&posEtichete[label]), 2);
+            }
+        } else if (currentInstruction == "call") {
+            while (line[i] == ' ') i += 1;
+
+            std::string funct = "";
+
+            while (isLetter (line[i]))
+                funct += line[i], i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&CFunctions[funct]), 1);
+        } else if (currentInstruction == "srai" || currentInstruction == "slli") {
+            while (line[i] == ' ') i += 1;
+
+            std::string currentRegister1 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister1 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            std::string currentRegister2 = "";
+
+            while (isLetter (line[i]) || isNumeric (line[i]))
+                currentRegister2 += line[i], i += 1;
+
+            while (!(isLetter (line[i]) || isNumeric (line[i]))) i += 1;
+
+            int nr = 0;
+            while (isNumeric (line[i]))
+                nr = nr * 10 + (int) (line[i] - '0'), i += 1;
+
+            executabil.write (reinterpret_cast<const char *> (&instructions[currentInstruction]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister1]), 1);
+            executabil.write (reinterpret_cast<const char *> (&Registers[currentRegister2]), 1);
+            executabil.write (reinterpret_cast<const char *> (&nr), 4);
+        }
     }
-
-   // std::cout << "Rezultat: " << registers["a0"].val << '\n';
-    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
-    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
-    //std::cout << "Rezultat: " << strings[registers["a0"].whichString];
-    //std::cout << "Rezultat: " << registers["t0"].val;
-    //std::cout << "Rezultat: ";
-//    for (int i = 0; i < arrayLong[0].size (); i += 1)
-//        std::cout << arrayLong[0][i] << ' ';
-
-    //std::cout << "Rezultat: " << registers["a0"].val << '\n';
-
-//    int index = registers["a0"].index;
-//    int whichString = registers["a0"].whichString;
-//    for (int i = 0; i < arrayFloat[whichString].size (); i += 1) {
-//        std::cout << arrayFloat[whichString][i] << ' ';
-//    }
-//
-//    index = registers["a1"].index;
-//    whichString = registers["a1"].whichString;
-//    for (int i = 0; i < arrayFloat[whichString].size (); i += 1) {
-//        std::cout << arrayFloat[whichString][i] << ' ';
-//    }
-
     return 0;
 }
